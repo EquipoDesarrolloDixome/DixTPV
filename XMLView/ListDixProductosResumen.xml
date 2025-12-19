@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<view>
+    <columns>
+        <group name="data" numcolumns="12">
+            <!-- IDs ocultos -->
+            <column name="idprodresumen" order="10" display="none">
+                <widget type="integer" fieldname="idprodresumen" />
+            </column>
+            <column name="idcaja" order="20" display="none">
+                <widget type="integer" fieldname="idcaja" />
+            </column>
+            <column name="claveprod" order="30" display="none">
+                <widget type="text" fieldname="claveprod" />
+            </column>
+
+            <!-- Datos visibles -->
+            <column name="referencia" order="40">
+                <widget type="text" fieldname="referencia" />
+            </column>
+            <column name="descripcion" order="50">
+                <widget type="text" fieldname="descripcion" />
+            </column>
+            <column name="unidades" order="60">
+                <!-- usa number/decimal según tu tema -->
+                <widget type="number" fieldname="unidades" />
+            </column>
+            <column name="total" order="70">
+                <widget type="money" fieldname="total" />
+            </column>
+        </group>
+    </columns>
+</view>

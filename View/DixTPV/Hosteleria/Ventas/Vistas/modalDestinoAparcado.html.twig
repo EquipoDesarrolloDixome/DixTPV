@@ -1,0 +1,24 @@
+<div class="modal fade" id="modalDestinoAparcado" tabindex="-1" aria-labelledby="modalDestinoAparcadoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalDestinoAparcadoLabel">¿Dónde aparcamos el ticket?</h5>
+                <button type="button" class="btn-close" aria-label="Cerrar" onclick="cancelarDestinoAparcado()"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-0">
+                    Estás en modo servicio rápido. Puedes enviar el pedido a una mesa concreta o dejarlo en el listado general de aparcados.
+                </p>
+            </div>
+            <div class="modal-footer d-flex flex-column flex-md-row gap-2">
+                <button type="button" class="btn btn-secondary w-100 w-md-auto" onclick="cancelarDestinoAparcado()">Cancelar</button>
+                <button type="button" class="btn btn-outline-primary w-100 w-md-auto" onclick="confirmarDestinoAparcado('listado')">
+                    Aparcar en listado general
+                </button>
+                <button type="button" class="btn btn-primary w-100 w-md-auto" onclick="confirmarDestinoAparcado('mesa')">
+                    Elegir mesa
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

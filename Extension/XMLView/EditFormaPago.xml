@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<view>
+    <columns>
+        <group name="advanced" numcolumns="12" valign="bottom">
+            <column name="Es efectivo" order="125">
+                <widget type="checkbox" fieldname="efectivo" />
+            </column>
+        </group>
+    </columns>
+</view>

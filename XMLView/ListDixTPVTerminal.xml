@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<view>
+    <columns>
+        <group name="data" numcolumns="12" >
+            <column name="code" order="100" display="none">
+                <widget type="number" fieldname="idtpv"/>
+            </column>
+            <column name="name" order="110">
+                <widget type="text" fieldname="nametpv"/>
+            </column>
+            <column name="document-type" order="120">
+                <widget type="select" fieldname="doctype">
+                    <values source="formatos_documentos" fieldcode="id" fieldtitle="tipodoc"/>
+                </widget>
+            </column>
+            <column name="ticket-format" order="130">
+                <widget type="text" fieldname="ticketformat"/>
+            </column>
+        </group>
+    </columns>
+</view>

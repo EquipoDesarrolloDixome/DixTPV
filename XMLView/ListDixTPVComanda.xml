@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<view>
+    <columns>
+        <group name="data" numcolumns="12">
+            <column name="num-comanda" order="100" display="none">
+                <widget type="number" fieldname="idcomanda" readonly="true"/> 
+            </column>
+            <column name="date" order="110">
+                <widget type="datetime" fieldname="fecha" required="true"/>
+            </column>
+            <column name="client" order="120">
+                <widget type="select" fieldname="idcliente" >
+                    <values source="clientes" fieldcode="codcliente" fieldtitle="nombre"/> 
+                </widget>
+            </column>
+            <column name="mesa" order="130">
+                <widget type="select" fieldname="idmesa" required="true">
+                    <values source="dix_mesa" fieldcode="idmesa" fieldtitle="nombre"/>
+                </widget>
+            </column>
+            <column name="estado" order="140">
+                <widget type="select" fieldname="idestado" required="true">
+                    <values source="dix_estado" fieldcode="idestado" fieldtitle="nombre"/> 
+                </widget>
+            </column>
+            <column name="total" order="150" display="none">
+                <widget type="number" fieldname="total" readonly="true"/>
+            </column>
+            <column name="observaciones" order="160">
+                <widget type="textarea" fieldname="observaciones"/>
+            </column>
+        </group>
+    </columns>
+</view>

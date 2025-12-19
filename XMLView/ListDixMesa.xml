@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<view>
+    <columns>
+        <group name="data" numcolumns="12">
+            <column name="idmesa" order="100" display= "none">
+                <widget type="number" fieldname="idmesa"/>
+            </column>
+            <column name="idsalon" order="100" display = 'none'>
+                <widget type="number" fieldname="idsalon" readonly="true"/>
+            </column>
+            <column name="idcomanda " order="100" display = 'none'>
+                <widget type="number" fieldname="idcomanda" readonly="true"/>
+            </column>
+            <column name="num-mesa" order="110">
+                <widget type="text" fieldname="nombre"/>
+            </column>
+            <column name="tipo-mesa" order="120">
+                <widget type="select" fieldname="tipo_mesa" required="true">
+                    <values source="dix_tipo_mesa" fieldcode="idtipomesa" fieldtitle="nombre"/> 
+                </widget>
+            </column>
+            <column name="comansales" order="115">
+                <widget type="integer" fieldname="comensales"/>
+            </column>            
+            <column name="observaciones" order="120">
+                <widget type="textarea" fieldname="observaciones"/>
+            </column>      
+            <column name="reservada" order="130">
+                <widget type="integer" fieldname="reservada"/>
+            </column>                  
+            <column name="localizacion" order="130">
+                <widget type="text" fieldname="ubicacion"/>
+            </column>
+        </group>
+    </columns>
+</view>

@@ -1,0 +1,32 @@
+<div class="modal fade" id="modalCambiarCliente" tabindex="-1" aria-labelledby="modalCambiarClienteLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalCambiarClienteLabel">Cambiar cliente</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="cliente_cambio">
+                <div class="mb-3">
+                    <label for="nombre_cliente_cambio" class="form-label">Cliente</label>
+                    <div class="input-group">
+                        <input type="text"
+                               class="form-control"
+                               id="nombre_cliente_cambio"
+                               placeholder="Buscar cliente por nombre o código">
+                        <button type="button" class="btn btn-success" onclick="nuevoCliente();" title="Crear cliente">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
+                    </div>
+                    <div class="form-text">
+                        Selecciona un cliente existente o crea uno nuevo para asociarlo a la venta actual.
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="confirmarCambioClienteManual()">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>

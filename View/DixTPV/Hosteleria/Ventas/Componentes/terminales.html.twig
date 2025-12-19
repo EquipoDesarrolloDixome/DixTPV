@@ -1,0 +1,121 @@
+{% block javascripts %}
+    <script src="{{ asset('Dinamic/Assets/JS/utilsTerminales.js') }}"></script>
+    <script src="{{ asset('Dinamic/Assets/JS/bootstrap5-compat.js') }}"></script>
+    <script src="{{ asset('Dinamic/Assets/JS/DixTPV.js') }}"></script>
+{% endblock %}
+
+<link rel="stylesheet" href="{{ asset('Dinamic/Assets/CSS/tpv-setup.css') }}"/>
+
+<div class="container mt-5 tpv">
+  <!-- TARJETA CONTENEDORA -->
+  <div class="card tpv-card mx-auto">
+    <div class="card-body">
+
+      <h1 class="mb-4 text-center tpv-title">Seleccione Terminal</h1>
+
+      <div class="row justify-content-center">
+        <input type="hidden" id="selectedTerminalId" name="selectedTerminalId">
+        <input type="hidden" id="selectedTerminalName">
+
+        <div class="mb-4 w-100">
+          <div class="row justify-content-center" id="terminales-container">
+            {% for term in fsc.terminales %}
+              <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-3">
+                <div class="card terminal-card text-center p-3 h-100 cursor-pointer tpv-terminal-card"
+                     data-terminal-id="{{ term.idtpv }}"
+                     data-terminal-name="{{ term.nametpv }}"
+                     data-terminal-cash="{{ term.dineroapertura|default(0) }}"
+                     onclick="seleccionarTerminal(this)">
+                  <i class="fa-solid {{ term.icon }} fa-2x mb-2"></i>
+                  <div>{{ term.nametpv }}</div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+          <input type="hidden" id="terminal" name="terminal" />
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="mb-4" hidden>
+          <label for="caja" class="form-label">Seleccione Caja:</label>
+          <select id="caja" class="form-select" name="caja" disabled>
+            <option value="">-- Seleccione una Caja --</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="text-center mb-3 tpv-actions">
+          <button class="btn btn-success" onclick="guardarSeleccion();">Aceptar</button>
+          <button class="btn btn-warning" onclick="window.location = './Dashboard';">Salir</button>
+        </div>
+      </div>
+
+      <!-- Dinero inicial SIEMPRE visible y en foco -->
+      <div class="row">
+        <div class="col-12">
+          <div id="dinero-inicial-container" class="mb-4">
+            <label for="dinero-inicial" class="form-label">Dinero Inicial:</label>
+            <input type="number" id="dinero-inicial" class="form-control"
+                   placeholder="Ingrese el dinero inicial" onclick="seleccionarInputTer(this);" autofocus
+                   onfocus="this.select(); seleccionarInputTer(this)" />
+          </div>
+        </div>
+
+        <div class="col-12">
+          <!-- Keypad -->
+          <div class="center tpv-keypad" aria-label="Teclado numérico">
+            <div class="row g-3">
+              <div class="col-4 text-center" onclick="agregarNumeroTer(1);">
+                <button class="btn btn-light w-100 calculator-button">1</button>
+              </div>
+              <div class="col-4 text-center" onclick="agregarNumeroTer(2);">
+                <button class="btn btn-light w-100 calculator-button">2</button>
+              </div>
+              <div class="col-4 text-center" onclick="agregarNumeroTer(3);">
+                <button class="btn btn-light w-100 calculator-button">3</button>
+              </div>
+
+              <div class="col-4 text-center" onclick="agregarNumeroTer(4);">
+                <button class="btn btn-light w-100 calculator-button">4</button>
+              </div>
+              <div class="col-4 text-center" onclick="agregarNumeroTer(5);">
+                <button class="btn btn-light w-100 calculator-button">5</button>
+              </div>
+              <div class="col-4 text-center" onclick="agregarNumeroTer(6);">
+                <button class="btn btn-light w-100 calculator-button">6</button>
+              </div>
+
+              <div class="col-4 text-center" onclick="agregarNumeroTer(7);">
+                <button class="btn btn-light w-100 calculator-button">7</button>
+              </div>
+              <div class="col-4 text-center" onclick="agregarNumeroTer(8);">
+                <button class="btn btn-light w-100 calculator-button">8</button>
+              </div>
+              <div class="col-4 text-center" onclick="agregarNumeroTer(9);">
+                <button class="btn btn-light w-100 calculator-button">9</button>
+              </div>
+
+              <div class="col-4 offset-4 text-center" onclick="agregarNumeroTer(0);">
+                <button class="btn btn-light w-100 calculator-button">0</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div> <!-- /card-body -->
+  </div>   <!-- /card -->
+</div>
+
+<script>
+  // Si algún navegador ignora autofocus, forzamos el foco:
+  window.requestAnimationFrame(() => {
+    const i = document.getElementById('dinero-inicial');
+    if (i) { i.focus(); i.select?.(); }
+  });
+
+  const terminales = {{ fsc.terminales | json_encode | raw }};
+  const cajas = {{ fsc.cajas | json_encode | raw }};
+</script>

@@ -1,0 +1,54 @@
+body {
+    margin-left: 10px;
+    margin-top: 60px; /* Ajusta este margen según la altura de la navbar */
+    overflow-x: hidden; /* Evita el scroll horizontal */
+}
+
+.familia-container {
+    overflow-y: auto;
+    max-height: 400px; /* Limitar altura para activar el scroll vertical */
+    white-space: normal; /* Evitar que los contenidos causen scroll horizontal */
+    width: 100%; /* Asegurarse de que no cause scroll horizontal */
+}
+
+/* Asegurarse que todos los elementos tengan box-sizing adecuado */
+* {
+    box-sizing: border-box;
+}
+
+/* Ajustes para la calculadora */
+.calculator-button {
+    padding: 5px;
+    margin: 3px;
+    width: 100%; /* Ocupa todo el ancho del contenedor */
+}
+/* Ajustes para evitar scroll horizontal en familias */
+.familia-container {
+    overflow-y: auto;
+    max-height: 400px; /* Limitar altura para activar el scroll vertical */
+    white-space: normal; /* Evitar que los contenidos causen scroll horizontal */
+}
+.navbar {
+    position: fixed; /* Fija la navbar en la parte superior */
+    top: 0;          /* Establece la posición superior en 0 */
+    width: 100%;     /* Abarca todo el ancho de la pantalla */
+    height: 60px;    /* Altura de la barra */
+    background-color: #333; /* Color de fondo */
+    display: flex;   /* Flexbox para alinear botones */
+    justify-content: space-around; /* Distribuye los botones equitativamente */
+    align-items: center; /* Centra los botones verticalmente */
+    z-index: 1000;   /* Asegura que esté por encima de otros elementos */
+}
+
+.navbar button {
+    background-color: #555; /* Color de fondo de los botones */
+    color: white;           /* Color del texto */
+    border: none;           /* Sin bordes */
+    padding: 10px 20px;     /* Espaciado interior */
+    cursor: pointer;        /* Cambia el cursor al pasar sobre el botón */
+    font-size: 16px;        /* Tamaño de la fuente */
+}
+
+.navbar button:hover {
+    background-color: #777; /* Cambia el color al pasar el ratón */
+}

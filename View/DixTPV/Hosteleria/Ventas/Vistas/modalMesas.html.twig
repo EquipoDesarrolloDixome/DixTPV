@@ -1,0 +1,17 @@
+<div class="modal fade" id="modalmesas" tabindex="-1" aria-labelledby="mesasModalLabel">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="mesasModalLabel">Mesas Disponibles</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Incluye la vista de cada mesa -->
+                {% include 'DixTPV/Hosteleria/Ventas/Componentes/mesa.html.twig' with {'waiter': mesa } %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>

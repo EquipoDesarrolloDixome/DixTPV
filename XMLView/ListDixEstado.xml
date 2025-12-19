@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<view>
+    <columns>
+        <group name="data" numcolumns="12">
+            <column name="idestado" order="100" display="none">
+                <widget type="number" fieldname="idcomanda" readonly="true"/> 
+            </column>
+            <column name="estado" order="140">
+                <widget type="text" fieldname="nombre" required="true">
+                    <values source="estado" fieldcode="idestado" fieldtitle="nombre"/> 
+                </widget>
+            </column>
+            <column name="descripcion" order="145">
+                <widget type="textarea" fieldname="descripcion" required="true">
+                    <values source="estado" fieldcode="idestado" fieldtitle="descripcion"/>
+                </widget>
+            </column>
+        </group>
+    </columns>
+</view>

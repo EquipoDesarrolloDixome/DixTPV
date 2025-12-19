@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+{# Plantilla principal del TPV Dix que orquesta estilos, scripts y bloques de contenido. #}
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="{{ constant('FS_LANG') | slice(0, 2) }}" xml:lang="{{ constant('FS_LANG') | slice(0, 2) }}">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <!-- Para depurar más rápidamente -->
+        {% set is_debug = true %}
+        {% if is_debug %}
+            {%  set path='Plugins/DixTPV/Assets' %}
+        {% else %}
+            {%  set path='Dinamic/Assets' %}
+        {% endif %}
+        {# Bloque de estilos que carga dependencias visuales del TPV. #}
+        {% block css %}
+            <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css"/>
+            <link rel="stylesheet" href="node_modules/@fortawesome/fontawesome-free/css/all.min.css"/>
+            <link
+                rel="stylesheet" href="{{ asset('Dinamic/Assets/CSS/custom.css') }}?v=6"/>
+                <!--<link rel="stylesheet" href="{{ asset(path ~ '/CSS/cssdixtpv.css') }}?v=6"/>
+                            <link rel="stylesheet" href="{{ asset(path ~ '/CSS/dixtpv.css') }}?v=6"/>-->
+            <link rel="stylesheet" href="{{ asset(path ~ '/CSS/tpv-bonito.css') }}?v=6"/>
+            <link rel="stylesheet" href="{{ asset('Dinamic/Assets/CSS/Componentes/camarerocss.css') }}?v=6"/>
+            <link rel="stylesheet" href="{{ asset('node_modules/jquery-ui-dist/jquery-ui.min.css') }}"/>
+            <link rel="icon" type="image/png" href="{{ asset('Dinamic/Assets/Images/favicon.ico') }}" />
+        {% endblock %}
+        {# Bloque de scripts que prepara las funcionalidades dinamicas del TPV. #}
+        {% block javascripts %}
+            <script src="{{ asset('node_modules/jquery/dist/jquery.min.js')}}"></script>
+            <script>
+                window.dixModoHosteleria = {{ fsc.modoHosteleria ? 'true' : 'false' }};
+            </script>
+            <script>
+                window.dixTarifasAvanzadas = {{ fsc.advancedTariffsEnabled ? 'true' : 'false' }};
+            </script>
+            <script>
+                window.dixTpvQzConfig = {{ fsc.qzConfig|json_encode|raw }};
+            </script>
+            <script src="{{ asset(path ~ '/JS/moduloInicial.js') }}"></script>
+            <script src="{{ asset(path ~ '/JS/moduloGeneral.js') }}"></script>
+            <script src="{{ asset(path ~ '/JS/moduloModifProducto.js') }}"></script>
+            <script src="{{ asset(path ~ '/JS/moduloCobro.js') }}"></script>
+            <script src="{{ asset(path ~ '/JS/moduloRectificar.js') }}"></script>
+            <script src="{{ asset(path ~ '/JS/printDoc.js') }}"></script>
+            <script src="{{ asset(path ~ '/JS/moduloCesta.js') }}"></script>
+            <script src="{{ asset(path ~ '/JS/moduloAparcados.js') }}"></script>
+            <script src="{{ asset(path ~ '/JS/moduloMesasSalones.js') }}"></script>
+            <script src="{{ asset(path ~ '/JS/moduloCaja.js') }}"></script>
+            <script src="{{ asset(path ~ '/JS/moduloCamareros.js') }}"></script>
+            <script src="{{ asset(path ~ '/JS/utilsTerminales.js') }}"></script>
+            <script src="{{ asset(path ~ '/JS/loader.js') }}"></script>
+            <script src="{{ asset(path ~ '/JS/nuevoCliente.js') }}"></script>
+            <script src="{{ asset(path ~ '/JS/newLine.js') }}"></script>
+            <script src="{{ asset(path ~ '/JS/autocompleteFields.js') }}?v=6"></script>
+            <script src="{{ asset('node_modules/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
+            <script src="{{ asset(path ~ '/JS/bootstrap5-compat.js') }}"></script>
+            <script src="{{ asset(path ~ '/JS/vendor/bootbox.min.js') }}"></script>
+            <script src="{{ asset(path ~ '/JS/vendor/bootbox.locales.min.js') }}"></script>
+            <script src="{{ asset('node_modules/pace-js/pace.min.js') }}"></script>
+            <script src="{{ asset('node_modules/@fortawesome/fontawesome-free/js/all.min.js') }}"></script>
+            <script src="{{ asset('Dinamic/Assets/JS/Custom.js') }}?v=6"></script>
+            <script src="{{ asset('node_modules/jquery-ui-dist/jquery-ui.min.js') }}?v=6"></script>
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <script src="{{ asset('Plugins/DixTPV/Assets/JS/dix-qz-security.js') }}"></script>
+        {% endblock %}
+    </head>
+    <body>
+        {% block body %}
+
+            {# Contenedor con parametros de configuracion que consultan los modulos JS. #}
+            <div id="config-terminal"
+                 data-mostrar-camarero="{{ fsc.mostrarCamarero ? 'true' : 'false' }}"
+                 data-camarero-mode="{{ fsc.mostrarCamareroPorPin ? 'pin' : 'list' }}"
+                 data-print-policy="{{ fsc.printPolicy }}"
+                 data-hosteleria="{{ fsc.modoHosteleria ? 'true' : 'false' }}"
+                 data-codalmacen="{{ fsc.selectedTerminal.codalmacen|default('')|e('html_attr') }}">
+            </div>
+            
+            {# Overlay personalizado para confirmar la impresión cuando se configure en "Preguntar" #}
+            <div id="printConfirmOverlay" class="dix-print-overlay" aria-hidden="true">
+                <div class="dix-print-dialog">
+                    <h5>Confirmar impresión</h5>
+                    <p>¿Quieres imprimir el ticket?</p>
+                    <div class="d-flex gap-2 justify-content-between mt-3">
+                        <button type="button" class="btn btn-light flex-fill btn-print-no">No</button>
+                        <button type="button" class="btn btn-success flex-fill btn-print-yes">Sí, imprimir</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="navbar">
+                    {# Navbar reutilizable con accesos directos para acciones comunes. #}
+                    {% include fsc.theme~'Vistas/navbar.html.twig' %}
+                </div>
+            </div>
+            <div class="row tpv-main-layout g-4">
+                <div class="col-12 col-lg-6 ps-3 ps-lg-4 pe-3 pe-lg-4 pt-2 tpv-main-left">
+                    <div class="titulo-header">
+                        <div class="titulo-contenido">
+                            <span class="mesa-seleccionada" id="mesaSeleccionada">Servicio rápido</span>
+                            <span class="total-amount">Total...
+                                <span id="total-amount">21.70</span>
+                                €</span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="pt-2 carroini">
+                            {# Vista parcial del carrito que se refresca desde JavaScript. #}
+                            {% include fsc.theme~'Vistas/carrito.html.twig' %}
+                        </div>
+                    </div>
+
+                    <div class="row botoneraini">
+                        <div class="col-6 col-sm-6 col-md-6 pt-3 ocultar-movil">
+                            <!-- Calculadora -->
+                            <div class="calculadora">
+                                <div class="teclas">
+                                    <button class="btn btn-light calculator-button" onclick="agregarNumero(1);">1</button>
+                                    <button class="btn btn-light calculator-button" onclick="agregarNumero(2);">2</button>
+                                    <button class="btn btn-light calculator-button" onclick="agregarNumero(3);">3</button>
+                                    <button class="btn btn-light calculator-button" onclick="agregarNumero(4);">4</button>
+                                    <button class="btn btn-light calculator-button" onclick="agregarNumero(5);">5</button>
+                                    <button class="btn btn-light calculator-button" onclick="agregarNumero(6);">6</button>
+                                    <button class="btn btn-light calculator-button" onclick="agregarNumero(7);">7</button>
+                                    <button class="btn btn-light calculator-button" onclick="agregarNumero(8);">8</button>
+                                    <button class="btn btn-light calculator-button" onclick="agregarNumero(9);">9</button>
+                                    <button class="btn btn-light calculator-button" onclick="agregarNumero('.');">,</button>
+                                    <button class="btn btn-light calculator-button" onclick="agregarNumero(0);">0</button>
+                                    <button class="btn btn-light calculator-button" onclick="borrarNumero();">←</button>
+                                </div>
+                            </div>
+                        </div>
+                <div class="col-6 col-md-6 col-sm-6 pt-3 pe-1">
+                            {# Acciones principales disponibles para el camarero. #}
+                            <div class="botonera">
+                                <a data-bs-target="#modalfinalizar" data-bs-toggle="modal" class="btn btn-success btn-full ocultar-movil" href="#modalfinalizar">Cobrar</a>
+                                <button class="btn btn-warning" onclick="vaciarCesta();">Vaciar</button>
+                                <button class="btn btn-warning" onclick="aparcarCuenta();">Aparcar</button>
+                                <button class="btn btn-warning ocultar-movil" onclick="abrirCajon();" >Abrir Cajón</button>
+                                {% if fsc.modoHosteleria %}
+                                <button class="btn btn-warning" onclick="moverMesa();">Mover mesa</button>
+                                {% endif %}
+                                <button class="btn btn-outline-success ocultar-movil" onclick="imprimirComprobante();">Compro.</button>
+                                {% if not fsc.modoHosteleria %}
+                                <button class="btn btn-outline-primary btn-change-client" onclick="abrirModalCambioCliente();">Cambiar cliente</button>
+                                {% endif %}
+                                <a data-bs-target="#newLine" data-bs-toggle="modal" class="btn btn-success" href="#newLine">+ linea</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Columna derecha -->
+                <div class="col-12 col-lg-6 ps-3 ps-lg-4 pe-3 pe-lg-4 pt-2 tpv-main-right d-flex flex-column gap-3 tpv-card-size-{{ fsc.cardSizeClass|default('medium')|e('html_attr') }}">
+                    {% if fsc.mostrarBuscador %}
+                    <div class="tpv-product-search card shadow-sm">
+                        <div class="card-body p-2">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text" id="productSearchIcon">
+                                    <i class="fa-solid fa-magnifying-glass"></i>
+                                </span>
+                                <input type="search"
+                                       class="form-control"
+                                       id="productSearchInput"
+                                       placeholder="Buscar nombre, referencia o código"
+                                       autocomplete="off"
+                                       spellcheck="false"
+                                       aria-label="Buscar productos"/>
+                            </div>
+                            <small id="productSearchHelper" class="text-muted d-block mt-2">
+                                Escribe para filtrar productos. Pulsa Enter con el código de barras.
+                            </small>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <div class="fam-container flex-fill">
+                        <div class="container fam-content scroll-invisible">
+                            {% for fam in fsc.familias %}
+                                {% include fsc.theme~'Componentes/familia.html.twig' with {
+                                    'family': fam,
+                                    'showDescription': fsc.mostrarDescripcionCartas
+                                } %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="prod-container flex-fill">
+                        <div class="container prod-content scroll-invisible">
+                            <div id="productos"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="messages-toasts"></div>
+            {% block modals %}
+                {# Conjunto de modales que soportan operaciones auxiliares del TPV. #}
+                {% include fsc.theme~'Vistas/modalCamareros.html.twig' %}
+                {% if fsc.modoHosteleria %}
+                    {% include fsc.theme~'Vistas/modalMesas.html.twig' %}
+                    {% include fsc.theme~'Vistas/modalDestinoAparcado.html.twig' %}
+                    {% include fsc.theme~'Vistas/modalAparcadosGenerales.html.twig' %}
+                {% endif %}
+                {% include fsc.theme~'Vistas/newLine.html.twig' %}
+                {% include fsc.theme~'Vistas/modalAnteriores.html.twig' %}
+                {% include fsc.theme~'Vistas/modalRectificar.html.twig' %}
+                {% include fsc.theme~'Vistas/modalAparcados.html.twig' %}
+                {% include fsc.theme~'Vistas/modalClienteAparcar.html.twig' %}
+                {% if not fsc.modoHosteleria %}
+                    {% include fsc.theme~'Vistas/modalCambiarCliente.html.twig' %}
+                {% endif %}
+                {% include fsc.theme~'Vistas/modalError.html.twig' %}
+                {% include fsc.theme~'Vistas/modalAbrirCajon.html.twig' %}
+                {% include fsc.theme~'Vistas/modalModifProducto.html.twig' %}
+                {% include fsc.theme~'Vistas/modalCierre.html.twig' %}
+                {% include fsc.theme~'Vistas/modalFinalizar.html.twig' %}
+                {% include fsc.theme~'Vistas/modalNuevoCliente.html.twig' %}
+                {% include 'Modal/PrintTicketModal.html.twig' %}
+            {% endblock %}
+        {% endblock %}
+    </body>
+</html>

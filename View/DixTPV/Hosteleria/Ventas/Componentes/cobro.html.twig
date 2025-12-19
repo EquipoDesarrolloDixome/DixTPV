@@ -1,0 +1,198 @@
+<!--<editor-fold desc="Autobúsqueda cliente y botones de cobrar">-->
+
+<div id="cliente_cobro_modal">
+    <div
+        class="row">
+        <!-- Columna izquierda: Cliente + botón -->
+        <div class="col-6">
+            <input type="hidden" name="codcliente" value="">
+            <div class="mb-2">
+                <div
+                    class="row">
+                    <!-- Input cliente -->
+                    <div class="col-7">
+                        <input type="hidden" id="cliente" value="{{ fsc.defaultClient.codcliente }}">
+                        <input type="text" onfocus="this.select();" class="form-control" id="nombre_cliente" placeholder="Cliente" value="{{ fsc.defaultClient.nombre }}">
+                    </div>
+                    <div class="col-2 ms-1">
+                        <button type="button" onclick="nuevoCliente();" class="btn btn-success">
+                            +
+                        </button>
+                    </div>
+                    <!-- Botón pasar todo al cobro -->
+                    <div class=" col-3 d-flex align-items-center">
+                        <button id="botonpasartodo" class="ocultar btn btn-outline-success w-100" onclick="pasarTodoACarritoFin()" title="Pasar todo al cobro">
+                            <i class="fas fa-angle-double-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Columna derecha: Botones de acción -->
+        <div class="col-6">
+            <div class="row">
+                <div class="col-12 d-flex justify-content-end gap-2">
+                    <button class="btn btn-primary" id="setAllButton" onclick="setEntregadoToTotal();">Saldo</button>
+                    <button type="button" id="clearTotal" class="btn btn-danger" onclick="limpiarCobrado();">Limpiar</button>
+                    <button class="btn btn-success" id="cobrarBoton" onclick="CobrarModal();">Cobrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--</editor-fold>-->
+
+<!-- Sección de la cesta (Div Cuenta) -->
+
+<div class="row py-3">
+    <div id="seccionCesta" class=" col-12 col-sm-12 col-md-12 ocultar">
+        <div
+            class="row">
+            <!--Sección para dividir Cesta -->
+            <div class="col-6 col-sm-6 col-md-6">
+                <div class="row">
+                    <div class="col-12 col-sm-12 col-md-12">
+                        <div
+                            id="listaProductosCesta"><!-- Productos cargados desde localStorage -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-sm-6 col-md-6">
+                <div class="row" style="display:none;">
+                    <div class="col-3 col-md-3 col-sm-3 fw-bold">
+                        <h6>Carro</h6>
+                    </div>
+                    <div class="col-9 col-md-9 col-sm-9 text-end fw-bold">
+                        <h6>Cambio:
+                            <span id="cambioDiv">0.00 €</span>
+                        </h6>
+                    </div>
+                </div>
+                <div
+                    id="listaProductosCobrados"><!-- Productos cobrados cargados desde localStorage -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="dividir_personas" class="ocultar">
+    <div class="row">
+        <div class="col-6 col-sm-6 col-md-6">
+            <div class="mb-3">
+                <label for="personas">Personas a dividir</label>
+                <div class="input-group">
+                    <input type="number" id="personas" value="1" min="1" onclick="seleccionarInput(this);">
+                    <h3>Por persona:
+                        <span id="totalPersona">0.00 €</span>
+                    </h3>
+                    <div>
+                        <!--<a class="btn btn-primary" onclick="CobrarCuenta();">Finalizar</a>-->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div
+            class="col-6 col-sm-6 col-md-6">
+            <!-- Números del 1 al 9 y botón de OK -->
+            {% for row in [1,4,7] %}
+                <div>
+                    {% for num in [row, row+1, row+2] %}
+                        <button class="btn btn-lg btn-outline-info" onclick="agregarNumeroTer({{num}});">{{num}}</button>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+            <div>
+                <button class="btn btn-lg  btn-outline-info" onclick="agregarNumero(0);">0</button>
+                <button class="btn btn-lg  btn-success" onclick="actualizarTotalPorPersona();">
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--<editor-fold desc="Formas de cobro, monedas y billetes">-->
+
+<!-- Formas de cobro y monedas+billetes -->
+
+<div class="row">
+    <div class="col-6 col-sm-6">
+        <!-- Formas de pago -->
+        <div class="mb-3" id="formaPagoClass">
+            <label for="formapago">Forma de pago</label>
+            <div class="monedas-billetes" id="formasPago">
+                {% set formaPagoDefault = fsc.selectedTerminal.codpago %}
+                {% for term in fsc.formaPago %}
+                    <div class="pago {% if term.codpago == fsc.selectedTerminal.codpago %}activo{% endif %}" 
+                         data-valor="{{ term.codpago }}" 
+                         data-esefectivo="{{ term.efectivo ? 'true' : 'false' }}">
+                        {{ term.descripcion|length > 15 ? term.descripcion|slice(0, 15) ~ '...' : term.descripcion }}
+                    </div>
+                {% endfor %}
+                <input type="text" class="form-control" id="FormaPago" hidden value="{{ formaPagoDefault }}">
+            </div>
+        </div>
+
+        {% if not fsc.modoHosteleria %}
+        {% set docOptions = {
+            'FacturaCliente': 'Factura',
+            'AlbaranCliente': 'Albarán',
+            'PedidoCliente': 'Pedido'
+        } %}
+        {% set docDefaultKey = fsc.selectedTerminal.doctype ?? 'FacturaCliente' %}
+        {% if docOptions[docDefaultKey] is not defined %}
+            {% set docDefaultKey = 'FacturaCliente' %}
+        {% endif %}
+        <div class="mb-3" id="documentTypeSelector">
+            <label for="TipoDocumento">Tipo de documento</label>
+            <div class="monedas-billetes" id="tiposDocumento">
+                {% for docType, label in docOptions %}
+                    <div class="pago {% if docType == docDefaultKey %}activo{% endif %}"
+                         data-valor="{{ docType }}">
+                        {{ label }}
+                    </div>
+                {% endfor %}
+                <input type="text" class="form-control" id="TipoDocumento" hidden value="{{ docDefaultKey }}">
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- 🔔 Series justo debajo de formas de pago, dentro de misma columna -->
+        <div class="mb-3" id="seriesDebajoDeFormasPago">
+            <label for="serie">Serie</label>
+            <div class="monedas-billetes" id="series">
+                {% set serieDefault = fsc.selectedTerminal.codserie ?? fsc.series[0].codserie %}
+                {% for serie in fsc.series %}
+                    <div class="pago {% if serie.codserie == serieDefault %}activo{% endif %}" 
+                         data-valor="{{ serie.codserie }}">
+                        {{ serie.descripcion|length > 15 ? serie.descripcion|slice(0, 15) ~ '...' : serie.descripcion }}
+                    </div>
+                {% endfor %}
+                <input type="text" class="form-control" id="SerieSeleccionada" hidden value="{{ serieDefault }}">
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-sm-6 col-md-6">
+        <!-- Monedas y billetes representados con cuadros -->
+        {% set monedas = [0.01, 0.02, 0.05, 0.10, 0.20, 0.50, 1, 2] %}
+        {% set billetes = [5, 10, 20, 50, 100, 200, 500] %}
+        <div class="monedas-billetes {% if fsc.defaultPaymentMethod.efectivo != 1 %}ocultar{% endif %}" id="monedasBilletes">
+            {% for valor in monedas %}
+                <div class="moneda" data-valor="{{ valor }}">{{ valor|number_format(2, ',', '.') }}
+                    €</div>
+                {% endfor %}
+                {% for valor in billetes %}
+                <div class="billete" data-valor="{{ valor }}">{{ valor }}
+                    €</div>
+                {% endfor %}
+        </div>
+    </div>
+</div>
+<!--</editor-fold>-->

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<table>
+    <column>
+        <name>idcaja</name>
+        <type>serial</type>
+        <null>NO</null>
+    </column>
+    <column>
+        <name>pertenenciaterminal</name>
+        <type>integer</type>
+        <null>NO</null>
+    </column>
+    <column>
+        <name>nombre</name>
+        <type>character varying (150)</type>
+    </column>
+    <column>
+        <name>dineroini</name>
+        <type>double</type>
+    </column>
+    <column>
+        <name>dinerofin</name>
+        <type>double</type>
+    </column>
+    <column>
+        <name>dinerocredito</name>
+        <type>double</type>
+    </column>
+    <column>
+        <name>dinerocierre</name>
+        <type>double</type>
+    </column>
+    <column>
+        <name>descuadre</name>
+        <type>double</type>
+        <null>YES</null>
+    </column>
+    <column>
+        <name>fechahoraapertura</name>
+        <type>datetime</type>
+        <null>YES</null>
+    </column>
+    <column>
+        <name>fechahoracierre</name>
+        <type>datetime</type>
+        <null>YES</null>
+    </column>
+    <column>
+        <name>camareroini</name>
+        <type>character varying (10)</type>
+        <null>YES</null>
+    </column>
+    <column>
+        <name>camarerofin</name>
+        <type>character varying (10)</type>
+        <null>YES</null>
+    </column>
+    <constraint>
+        <name>dixtpv_cajas_pkey</name>
+        <type>PRIMARY KEY (idcaja)</type>
+    </constraint>
+    <!--
+    <constraint>
+        <name>dixtpv_cajas_pertenenciaterminal</name>
+        <type>FOREIGN KEY (pertenenciaterminal) REFERENCES dixtpv (idtpv) ON UPDATE CASCADE ON DELETE RESTRICT </type>
+    </constraint>-->
+    <constraint>
+        <name>dixtpv_cajas_camareroini</name>
+        <type>FOREIGN KEY (camareroini) REFERENCES agentes (codagente) ON UPDATE CASCADE ON DELETE RESTRICT </type>
+    </constraint>
+    <constraint>
+        <name>dixtpv_cajas_camarerofin</name>
+        <type>FOREIGN KEY (camarerofin) REFERENCES agentes (codagente) ON UPDATE CASCADE ON DELETE RESTRICT </type>
+    </constraint>
+</table>

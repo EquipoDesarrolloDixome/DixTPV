@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<view>
+    <columns>
+        <group name="data" numcolumns="12"> 
+            <column name="iddetalle" order="100" display ='none'>
+                <widget type="number" fieldname="iddetalle" readonly="true"/>
+            </column>
+            <column name="idcomanda" order="110" display ='none'>
+                <widget type="integer" fieldname="idcomanda" >
+                    <values source="dix_comanda" fieldcode="idcomanda" fieldtitle="idcomanda"/>
+                </widget>
+            </column>
+            <column name="product" order="95" display ="none">
+                <widget type="select" fieldname="idproducto" required="true" onchange="updatePrice(this)">
+                    <values source="productos" fieldcode="idproducto" fieldtitle="descripcion"/> 
+                </widget>
+            </column>
+            <column name="Descripcion" order="100">
+                <widget type="text" fieldname="descripcion"/>
+            </column>
+            <column name="cantidad" order="105">
+                <widget type="number" fieldname="cantidad"/>
+            </column>
+            <column name="precio-unitario" order="110">
+                <widget type="money" fieldname="precio_unitario" readonly="true"/>
+            </column>
+            <column name="precio-total" order="115">
+                <widget type="money" fieldname="precio_total" readonly="true"/>
+            </column>
+        </group>
+    </columns>
+</view>

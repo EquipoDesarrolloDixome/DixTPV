@@ -1,0 +1,56 @@
+<div class="modal fade" id="modalcamareros" tabindex="-1" aria-labelledby="camarerosModalLabel" aria-modal="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content shadow-lg rounded">
+      <div class="modal-header camarero-header text-white">
+        <h5 class="modal-title" id="camarerosModalLabel">Seleccionar Agente</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar" hidden></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="container-fluid">
+          <div class="row">
+
+            {% set usePin = fsc.mostrarCamareroPorPin %}
+
+            {# === LISTA DE CAMAREROS === #}
+            <div class="col-12 waiter-mode-list" {% if usePin %}style="display:none"{% endif %}>
+              <div class="row listaCamareros">
+                {% for camarero in fsc.camareros %}
+                  {% include 'DixTPV/Hosteleria/Ventas/Componentes/camarero.html.twig' with {'waiter': camarero } %}
+                {% endfor %}
+              </div>
+            </div>
+
+            {# === ZONA DE PIN === #}
+            <div class="col-12 waiter-mode-pin" {% if not usePin %}style="display:none"{% endif %}>
+              <form id="form-pin-camarero" class="row g-3 justify-content-center" novalidate>
+                <div class="col-12 d-flex justify-content-center">
+                  <input class="form-control w-auto text-center" type="password" id="clave-camarero"
+                         placeholder="clave. . ." onclick="seleccionarInputCam(this);" autocomplete="off"
+                         {% if usePin %}autofocus{% endif %}/>
+                </div>
+              </form>
+
+              <div class="mt-3 d-flex flex-wrap justify-content-center calculator-container">
+                <div class="d-grid gap-2 padNumericCamareros">
+                  {% for num in [1,2,3,4,5,6,7,8,9,0] %}
+                    <button type="button" class="btn btn-outline-secondary btn-lg px-4 py-3 mb-2 me-2" onclick="agregarNumeroCam({{ num }});">
+                      {{ num }}
+                    </button>
+                  {% endfor %}
+                  <button type="button" class="btn btn-success btn-lg px-4 py-3 mb-2 me-2 text-center" onclick="verificarClave();">OK</button>
+                  <button type="button" class="btn btn-warning btn-lg px-4 py-3 mb-2 me-2" onclick="borrarUltimoDigito();">C</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer" hidden>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>

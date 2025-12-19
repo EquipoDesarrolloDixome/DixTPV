@@ -1,0 +1,42 @@
+<form id="miFormulario">
+    <label for="terminal">AASelecciona un Terminal:</label>
+    <select id="terminal" name="terminal" onchange="cargarCajas()">
+        <option value="">-- Selecciona un Terminal --</option>
+        {% for id, terminal in terminales %}
+            <option value="{{ id }}">{{ terminal.nombre }}</option>
+        {% endfor %}
+    </select>
+
+    <label for="caja">Selecciona una Caja:</label>
+    <select id="caja" name="caja" disabled>
+        <option value="">-- Selecciona una Caja --</option>
+    </select>
+</form>
+
+<script>
+    // Datos de terminales y cajas (puedes cargar esto desde PHP)
+    const terminales = {{ terminales | json_encode | raw }};
+
+    function cargarCajas() {
+        const terminalSelect = document.getElementById('terminal');
+        const cajaSelect = document.getElementById('caja');
+        const selectedTerminalId = terminalSelect.value;
+
+        // Limpia las opciones de caja
+        cajaSelect.innerHTML = '<option value="">-- Selecciona una Caja --</option>';
+        cajaSelect.disabled = true;
+
+        if (selectedTerminalId) {
+            const cajas = terminales[selectedTerminalId].cajas;
+
+            cajas.forEach(caja => {
+                const option = document.createElement('option');
+                option.value = caja.id;
+                option.textContent = caja.nombre;
+                cajaSelect.appendChild(option);
+            });
+
+            cajaSelect.disabled = false; // Habilita la selección de cajas
+        }
+    }
+</script>

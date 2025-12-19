@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<view>
+    <columns>
+        <group name="data" numcolumns="12">
+            <column name="codtarifa" order="90" display="none">
+                <widget type="integer" fieldname="codtarifa" />
+            </column>
+            <column name="name" order="110" numcolumns="12">
+                <widget type="text" fieldname="nombre" />
+            </column>
+            <column name="fecha-ini" order="120"  numcolumns="3">
+                <widget type="date" fieldname="fechainitarifa" />
+            </column>
+            <column name="fecha-fin" order="130" numcolumns="3">
+                <widget type="date" fieldname="fechainitarifa" />
+            </column>
+            <column name="hora-inicio" order="140" numcolumns="3">
+                <widget type="time" fieldname="horaini" />
+            </column>
+            <column name="hora-fin" order="150" numcolumns="3">
+                <widget type="time" fieldname="horafin" />
+            </column>
+            <column name="incremento1" order="160" numcolumns="3">
+                <widget type="double" fieldname="incremento1" min="0" max="100"/>
+            </column>
+            <column name="incremento2" order="170" numcolumns="3">
+                <widget type="double" fieldname="incremento2" min="0" max="100"/>
+            </column>
+            <column name="dto1" order="180"  numcolumns="3">
+                <widget type="double" fieldname="descuento1" />
+            </column>
+            <column name="dto2" order="180" numcolumns="3">
+                <widget type="double" fieldname="descuento2" />
+            </column>
+        </group>
+    </columns>
+</view>

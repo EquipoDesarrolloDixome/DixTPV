@@ -1,0 +1,47 @@
+<div class="modal fade" id="modalfinalizar" tabindex="-1" aria-labelledby="cobrarModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-xl modal-fullscreen-md-down">
+		<div class="modal-content">
+			<div class="modal-header flex-column flex-lg-row align-items-stretch gap-3">
+				<div class="flex-grow-1 w-100">
+					<div class="btn-group w-100" role="group" aria-label="opciones de cobro">
+						<label class="btn btn-outline-primary" id="lblbtnnormal" for="btnnormal" onclick="toggleNormal();">Normal</label>
+						<label class="btn btn-outline-primary" id="lblbtnDivCuenta" for="btnDivCuenta" onclick="toggleDivCuenta();">Div Cuenta</label>
+					</div>
+				</div>
+				<div class="flex-grow-1 w-100">
+					<div class="table-responsive">
+						<table class="table table-borderless mb-0 align-middle text-center">
+							<thead class="fw-semibold">
+								<tr>
+									<th class="thcobro">Total</th>
+									<th class="thcobro">Cobrar</th>
+									<th class="thcobro">Entregado</th>
+									<th class="thcobro">Cambio</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td class="bordetabla" id="totVenta">0.00</td>
+									<td class="bordetabla" id="totCobrar">0.00</td>
+									<td class="bordetabla" id="totEntregado">0.00</td>
+									<td class="bordetabla" id="totCambio">0.00</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<button type="button" class="btn-close align-self-start" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+			</div>
+
+			<div class="modal-body">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-12 col-md-12 col-lg-12 mb-12">
+							{% include 'DixTPV/Hosteleria/Ventas/Componentes/cobro.html.twig' with {'waiter': cobro } %}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

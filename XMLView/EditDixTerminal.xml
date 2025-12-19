@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<view>
+    <columns>
+        <group name="data" numcolumns="12">
+            <column name="terminal-id" order="100" display="none">
+                <widget type="number" fieldname="idtpv" readonly="true"/>
+            </column>
+            <column name="name" order="110">
+                <widget type="text" fieldname="nametpv"/>
+            </column>
+            <column name="document-type" order="120">
+                <widget type="select" fieldname="doctype" readonly="true">
+                    <values source="formatos_documentos" fieldcode="id" fieldtitle="tipodoc"/>
+                </widget>
+            </column>
+            <column name="Cliente" order="120">
+                <widget type="select" fieldname="codcliente">
+                    <values source="clientes" fieldcode="codcliente" fieldtitle="nombre"/>
+                </widget>
+            </column>
+            <column name="dineroapertura" order="130" title="Dinero inicial por defecto">
+                <widget type="number" fieldname="dineroapertura" step="0.01" icon="fa-solid fa-coins"/>
+            </column>
+        </group>
+        <group name="settings" numcolumns="12">
+            <column name="discount" order="100" display="none">
+                <widget type="checkbox" fieldname="adddiscount"/>
+            </column>
+            <column name="discount-type" order="110" display="none">
+                <widget type="checkbox" fieldname="adddiscount1"/>
+            </column>
+            <column name="price-change" order="120" display="none">
+                <widget type="checkbox" fieldname="changeprice"/>
+            </column>
+            <column name="currency" order="130">
+                <widget type="select" fieldname="coddivisa" readonly="true">
+                    <values source="divisas" fieldcode="coddivisa" fieldtitle="descripcion"/>
+                </widget>
+            </column>
+            <column name="payment-method" order="140">
+                <widget type="select" fieldname="codpago">
+                    <values source="formaspago" fieldcode="codpago" fieldtitle="descripcion"/>
+                </widget>
+            </column>
+            <column name="series" order="150">
+                <widget type="select" fieldname="codserie">
+                    <values source="series" fieldcode="codserie" fieldtitle="descripcion"/>
+                </widget>
+            </column>
+            <column name="Impresion" order="155">
+                <widget type="select" fieldname="impresion" translate="true" required="true">
+                    <values title="Preguntar">-1</values>
+                    <values title="Nunca">0</values>
+                    <values title="Siempre">1</values>
+                </widget>
+            </column>
+            <column name="printer" numcolumns="3" order="156" titleurl="ListTicketPrinter">
+                <widget type="select" fieldname="idprinter" icon="fa-solid fa-print">
+                    <values source="tickets_printers" fieldcode="id" fieldtitle="name"/>
+                </widget>
+            </column>
+            <column name="mostrarcamareros" display="center" order="160">
+                <widget type="checkbox" fieldname="mostrarcamareros"/>
+            </column>
+            <column name="mostrarporpin" display="center" order="165">
+                <widget type="checkbox" fieldname="mostrarporpin"/>
+            </column>
+            <column name="hosteleria" display="center" order="167" title="Hostelería">
+                <widget type="checkbox" fieldname="hosteleria" label="Hostelería"/>
+            </column>
+            <column name="mostrarbuscador" display="center" order="170" title="Mostrar buscador">
+                <widget type="checkbox" fieldname="mostrarbuscador" label="Mostrar buscador"/>
+            </column>
+            <column name="mostrardescripcion" display="center" order="175" title="Mostrar descripción">
+                <widget type="checkbox" fieldname="mostrardescripcion" label="Mostrar descripción"/>
+            </column>
+            <column name="cardsize" display="center" order="180" title="Tamaño cartas" numcolumns="2">
+                <widget type="select" fieldname="cardsize" required="true">
+                    <values title="Pequeño">small</values>
+                    <values title="Mediano">medium</values>
+                    <values title="Grande">large</values>
+                </widget>
+            </column>
+        </group>
+    </columns>
+</view>

@@ -1,0 +1,7 @@
+{% set showCardDescription = showDescription|default(false) %}
+{% for product in products %}
+    {% include 'DixTPV/Hosteleria/Ventas/Componentes/producto.html.twig' with {
+        'product': product,
+        'showDescription': showCardDescription
+    } %}
+{% endfor %}

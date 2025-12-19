@@ -1,0 +1,43 @@
+<div class="navbar-fixed">
+    <div class="navbar-left">
+        {% if fsc.modoHosteleria %}
+            <a class="btn btn-primary" href="#modalmesas" data-bs-toggle="modal" data-bs-target="#modalmesas">Mesas</a>
+            <a class="btn btn-primary" href="#modalaparcadosgenerales" data-bs-toggle="modal" data-bs-target="#modalaparcadosgenerales">Aparcados</a>
+        {% else %}
+            <a class="btn btn-primary" href="#modalaparcados" data-bs-toggle="modal" data-bs-target="#modalaparcados">Aparcados</a>
+        {% endif %}
+        <a class="btn btn-primary ocultar-movil" href="#modalanteriores" data-bs-toggle="modal" data-bs-target="#modalanteriores">Anteriores</a>
+        <a class="btn btn-primary" onclick="activarServicioRapido()">Servicio Rápido</a>
+        <a class="btn btn-primary" href="#modalcamareros" data-bs-toggle="modal" data-bs-target="#modalcamareros">Agentes</a>
+    </div>
+    <div class="navbar-right">
+        <a class="btn btn-danger" href="#modalAbrirCaja" data-bs-toggle="modal" data-bs-target="#modalAbrirCaja">Abrir Caja</a>
+        <a class="btn btn-danger" onclick="cerrarCaja()">Cerrar Caja</a>
+        <a class="btn btn-danger" onclick="window.location = './Dashboard';">Salir</a>
+    </div>
+</div>
+
+
+<script>
+    function activarServicioRapido() {
+        carrito = localStorage.getItem('carrito');
+        // Verifica si el carrito existe y no está vacío
+        if (carrito && carrito.trim() !== "" && carrito !== "[]") {
+            aparcarCuenta();
+        } else {
+            // Elimina el contenido de la mesa y el salón seleccionados
+            sessionStorage.removeItem('mesaSeleccionada');
+            sessionStorage.removeItem('salonSeleccionado');
+            sessionStorage.removeItem('idcomanda');
+            localStorage.removeItem('idcomanda');
+
+            // Actualiza el texto para mostrar "Servicio rápido"
+            const mesaElemento = document.getElementById('mesaSeleccionada');
+            if (mesaElemento) {
+                mesaElemento.textContent = 'Servicio rápido';
+            }
+            // Limpia el carrito y el precio
+            eliminarCesta();
+        }
+    }
+</script>

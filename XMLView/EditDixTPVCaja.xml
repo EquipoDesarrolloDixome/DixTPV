@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<view>
+    <columns>
+        <group name="data" numcolumns="12">
+            <column name="box-id" order="70" display ="none">
+                <widget type="integer" fieldname="idcaja" />
+            </column>
+            <column name="nombre" order="75" numcolumns="4" title="Nombre">
+                <widget type="text" fieldname="nombre" readonly="true"/>
+            </column>
+            <column name="pertenencia-terminal" order="80" numcolumns="4" title="Terminal">
+                <widget type="select" fieldname="pertenenciaterminal" readonly="true"> 
+                    <values source="dixtpv" fieldcode="idtpv" fieldtitle="nametpv" />
+                </widget>
+            </column>
+            <column name="dinero-inicio" order="90" numcolumns="4" title="Dinero al inicio">
+                <widget type="double" fieldname="dineroini" readonly="true"/>
+            </column>
+            <column name="dinero-fin" order="100" numcolumns="4" title="Dinero al cierre">
+                <widget type="double" fieldname="dinerocierre" readonly="true"/>
+            </column>
+            <column name="descuadre" order="110" numcolumns="4" title="Descuadre">
+                <widget type="double" fieldname="descuadre" readonly="true"/>
+            </column>
+            <column name="fechahoraapertura" order="120" numcolumns="6" title="Fecha y hora de apertura">
+                <widget type="datetime" fieldname="fechahoraapertura" readonly="true"/>
+            </column>
+            <column name="fechahoracierre" order="130" numcolumns="6" title="Fecha y hora de cierre">
+                <widget type="datetime" fieldname="fechahoracierre" readonly="true"/>
+            </column>
+            <column name="camarero-ini" order="140" numcolumns="6" title="Camarero inicio">
+                <widget type="text" fieldname="camareroini" readonly="true"/>
+            </column>
+            <column name="camarero-fin" order="150" numcolumns="6" title="Camarero fin">
+                <widget type="text" fieldname="camarerofin" readonly="true"/>
+            </column>      
+        </group>
+    </columns>
+</view> 

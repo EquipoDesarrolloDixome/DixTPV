@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<table>
+    <column>
+        <name>idmesa</name>
+        <type>serial</type>
+        <null>NO</null>
+    </column>
+    <column>
+        <name>idsalon</name>
+        <type>integer</type>
+        <null>YES</null>
+    </column>
+    <column>
+        <name>nombre</name>
+        <type>character varying(100)</type>
+        <null>NO</null>
+    </column>
+    <column>
+        <name>tipo_mesa</name>
+        <type>integer</type>
+    </column>
+    <column>
+        <name>comensales</name>
+        <type>integer</type>
+        <null>YES</null>
+    </column>
+    <column>
+        <name>observaciones</name>
+        <type>character varying(500)</type>
+        <null>YES</null>
+    </column>
+    <column>
+        <name>estado</name>
+        <type>integer</type>
+        <null>YES</null>
+    </column>
+    <column>
+        <name>posx</name>
+        <type>double</type>
+        <null>YES</null>
+    </column>
+    <column>
+        <name>posy</name>
+        <type>double</type>
+        <null>YES</null>
+    </column>
+    <constraint>
+        <name>dix_mesa_pkey</name>
+        <type>PRIMARY KEY (idmesa)</type>
+    </constraint>
+    <constraint>
+        <name>dix_mesa_idsalon</name>
+        <type>FOREIGN KEY (idsalon) REFERENCES dix_salones (idsalon) ON UPDATE CASCADE ON DELETE CASCADE </type>
+    </constraint>
+    <constraint>
+        <name>dix_mesa_estado</name>
+        <type>FOREIGN KEY (estado) REFERENCES dix_estado (idestado) ON UPDATE CASCADE ON DELETE RESTRICT </type>
+    </constraint>
+    <constraint>
+        <name>dix_mesa_tipo_mesa</name>
+        <type>FOREIGN KEY (tipo_mesa) REFERENCES dix_tipo_mesa (idtipomesa) ON UPDATE CASCADE ON DELETE RESTRICT </type>
+    </constraint>
+</table>

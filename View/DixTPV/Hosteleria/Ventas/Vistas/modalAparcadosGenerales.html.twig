@@ -1,0 +1,30 @@
+<div class="modal fade" id="modalaparcadosgenerales" tabindex="-1" aria-labelledby="aparcadosGeneralesLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="aparcadosGeneralesLabel">Aparcados generales</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                {% set aparcadosGenerales = [] %}
+                {% for aparcado in fsc.aparcados %}
+                    {% set esGeneral = aparcado.nombremesa is empty or aparcado.nombremesa == 'Listado' %}
+                    {% if esGeneral %}
+                        {% set aparcadosGenerales = aparcadosGenerales|merge([aparcado]) %}
+                    {% endif %}
+                {% endfor %}
+
+                {% if aparcadosGenerales is empty %}
+                    <div class="alert alert-info mb-0">
+                        No hay tickets aparcados en el listado general.
+                    </div>
+                {% else %}
+                    {% include 'DixTPV/Hosteleria/Ventas/Componentes/aparcados.html.twig' with {'aparcadosLista': aparcadosGenerales} %}
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>

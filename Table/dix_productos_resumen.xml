@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<table>
+    <column>
+        <name>idprodresumen</name>
+        <type>serial</type>
+        <null>NO</null>
+    </column>
+
+    <column>
+        <name>idcaja</name>
+        <type>integer</type>
+        <null>NO</null>
+    </column>
+
+    <!-- Clave de agrupación: referencia si existe; si no, descripción normalizada -->
+    <column>
+        <name>claveprod</name>
+        <type>character varying(160)</type>
+        <null>NO</null>
+    </column>
+
+    <!-- Datos informativos -->
+    <column>
+        <name>referencia</name>
+        <type>character varying(120)</type>
+        <null>YES</null>
+    </column>
+    <column>
+        <name>descripcion</name>
+        <type>character varying(255)</type>
+        <null>YES</null>
+    </column>
+
+    <!-- Acumulados -->
+    <column>
+        <name>unidades</name>
+        <type>double precision</type>
+        <default>0</default>
+    </column>
+    <column>
+        <name>total</name>
+        <type>double precision</type>
+        <default>0</default>
+    </column>
+
+    <constraint>
+        <name>dix_productos_resumen_pkey</name>
+        <type>PRIMARY KEY (idprodresumen)</type>
+    </constraint>
+
+    <!-- Evita duplicados del mismo producto dentro de una caja -->
+    <constraint>
+        <name>uniq_caja_claveprod</name>
+        <type>UNIQUE (idcaja, claveprod)</type>
+    </constraint>
+</table>

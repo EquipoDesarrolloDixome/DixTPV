@@ -1,0 +1,761 @@
+<?php
+
+namespace FacturaScripts\Plugins\DixTPV\Controller;
+
+use FacturaScripts\Core\Base\Controller;
+use FacturaScripts\Core\Base\DataBase\DataBaseWhere;
+use FacturaScripts\Dinamic\Model\FormaPago;
+use FacturaScripts\Dinamic\Model\FormatoDocumento;
+use FacturaScripts\Dinamic\Model\Agente;
+use FacturaScripts\Dinamic\Model\Familia;
+use FacturaScripts\Dinamic\Model\Cliente;
+use FacturaScripts\Dinamic\Model\Producto;
+use FacturaScripts\Dinamic\Model\Variante;
+use FacturaScripts\Dinamic\Model\DixMesa;
+use FacturaScripts\Dinamic\Model\DixTPVCaja;
+use FacturaScripts\Dinamic\Model\DixSalon;
+use FacturaScripts\Dinamic\Model\DixDetailComanda;
+use FacturaScripts\Dinamic\Model\FacturaCliente;
+use FacturaScripts\Dinamic\Model\LineaFacturaCliente;
+use FacturaScripts\Dinamic\Model\AlbaranCliente;
+use FacturaScripts\Dinamic\Model\LineaAlbaranCliente;
+use FacturaScripts\Dinamic\Model\PedidoCliente;
+use FacturaScripts\Dinamic\Model\LineaPedidoCliente;
+use FacturaScripts\Dinamic\Model\PresupuestoCliente;
+use FacturaScripts\Dinamic\Model\LineaPresupuestoCliente;
+use FacturaScripts\Plugins\DixTPV\Model\DixTPVComanda;
+use FacturaScripts\Plugins\DixTPV\Model\DixTerminal;
+use FacturaScripts\Core\Html;
+use FacturaScripts\Dinamic\Lib\AssetManager;
+use FacturaScripts\Core\Tools;
+use FacturaScripts\Plugins\DixTPV\Funciones\Funciones;
+use FacturaScripts\Core\Base\Calculator;
+//use FacturaScripts\Plugins\DixTPV\Lib\Utils\UtilsTPV;
+use FacturaScripts\Plugins\DixTPV\Lib\UtilsTPV;
+use FacturaScripts\Plugins\PrintTicket\Lib\PrintingService;
+use FacturaScripts\Dinamic\Model\FormatoTicket;
+
+/**
+ * Controlador de las ventas POS para Dixome
+ *
+ *  
+ * @author Alexis Cambeiro <alexis@dixome.com>
+ */
+class DixTPV extends Controller {
+    /*     * * Creamos propiedades públicas, estas propiedades son accesibles desde twig  a través de 
+     * fsc  (fs.camareros)
+     */
+
+    public $camareros;
+    public $familias;
+    public $theme;
+    public $mesas;
+    public $salones;
+    public $aparcados;
+    public $terminales;
+    public $cajas;
+    public $cajaActivaFecha;
+    public $formaPago;
+    public $cestaDeCompra;
+    public $idCaja;
+    public $FormatoDocumento;
+
+    public function getPageData(): array {
+        $pageData = parent::getPageData();
+        $pageData["title"] = "DixPOS";
+        $pageData["menu"] = "DixTPV";
+        $pageData["icon"] = "fas fa-cash-register";
+        return $pageData;
+    }
+
+// En el método privateCore o donde se maneja la solicitud principal
+    public function privateCore(&$response, $user, $permissions) {
+        parent::privateCore($response, $user, $permissions);
+        $this->theme = 'DixTPV/Hosteleria/Ventas/';
+        $this->loadBasicData();
+
+        $action = $this->request->get('action', '');
+        if ($action) {
+            $this->execAfterAction($action);
+        } else {
+            $this->createView();
+        }
+    }
+
+    /** Cargamos los datos que razonablemente no van a variar en una sesión de venta
+     * como los camareros (agentes) y las familias
+     *
+     */
+    /* protected function loadBasicData(): void {
+      $this->camareros = $this->loadModel(Agente::class);
+      $this->familias = $this->loadModel(Familia::class);
+      $this->mesas = $this->loadModel(DixMesa::class);
+      $this->salones = $this->loadModel(DixSalon::class);
+      $this->aparcados = $this->loadModel(DixTPVComanda::class);
+      $this->terminales = $this->loadModel(DixTerminal::class);
+      $this->cajas = $this->loadModel(DixTPVCaja::class);
+      $this->formaPago = $this->loadModel(FormaPago::class);
+
+      $this->startSession();
+      $_SESSION['cestaDeCompra'] = $_SESSION['cestaDeCompra'] ?? [];
+      $this->cestaDeCompra = $_SESSION['cestaDeCompra'];
+      } */
+    protected function loadBasicData(): void {
+        $this->camareros = $this->loadModel(Agente::class);
+        $this->familias = $this->loadModel(Familia::class);
+        $this->mesas = $this->loadModel(DixMesa::class);
+        $this->salones = $this->loadModel(DixSalon::class);
+        $this->aparcados = $this->loadModel(DixTPVComanda::class);
+        $this->terminales = $this->loadModel(DixTerminal::class);
+        $this->cajas = $this->loadModel(DixTPVCaja::class);
+        $this->formaPago = $this->loadModel(FormaPago::class);
+        $this->FormatoDocumento = $this->loadModel(FormatoDocumento::class);
+        $this->cestaDeCompra = [];
+    }
+
+    private function startSession(): void {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+    }
+
+    private function loadModel(string $modelClass): array {
+        $model = new $modelClass();
+        return $model->all([], [], 0, 0);
+    }
+
+    /** Un turno estará abierto si tenemos en la sesión (o en la cookie) asignado un camarero y una caja abierta 
+     * 
+     * @return bool
+     */
+    protected function turnoAbierto(): bool {
+        $caja = new DixTPVCaja();
+        $cajaAbierta = $caja->all([new DataBaseWhere('fechahoracierre', null)]);
+        if (!empty($cajaAbierta)) {
+            $this->cajaActivaFecha = $cajaAbierta[0]->fechahoraapertura;
+            return true;
+        }
+        return false;
+    }
+
+    /*     * * Mostramos una vista u otra según esté abierto o no el turno */
+
+    function cerrarCajaAuto() {
+        $camarero = floatval($this->request->get('camarero'));
+        $dineroFinal = floatval($this->request->get('dineroFinal'));
+
+        // Obtener la caja abierta
+        $caja = new DixTPVCaja();
+        $cajaAbierta = $caja->all([new DataBaseWhere('fechahoracierre', null)]);
+
+        if (empty($cajaAbierta)) {
+            echo json_encode(['status' => 'error', 'message' => 'No hay ninguna caja abierta.']);
+            exit;
+        }
+
+        $caja = $cajaAbierta[0];
+
+        // Calcular el dinero de cierre y cerrar la caja sin descuadre
+        $caja->dinerocierre = $caja->dinerofin + $caja->dinerocredito + $caja->dineroini;
+        $caja->fechahoracierre = date('Y-m-d H:i:s');
+        $caja->descuadre = 0;
+        $caja->camarerofin = $camarero;
+        $caja->save();
+
+        header('Content-Type: application/json');
+        echo json_encode(['status' => 'success']);
+        exit;
+    }
+
+    function cerrarCaja() {
+        $aceptaDescuadre = $this->request->get('aceptaDescuadre');
+        $dineroFinal = floatval($this->request->get('dineroFinal'));
+        $camarero = floatval($this->request->get('camarero'));
+
+        // Obtener la caja abierta
+        $caja = new DixTPVCaja();
+        $cajaAbierta = $caja->all([new DataBaseWhere('fechahoracierre', null)]);
+
+        if (empty($cajaAbierta)) {
+            echo json_encode(['status' => 'error', 'message' => 'No hay ninguna caja abierta.']);
+            exit;
+        }
+
+        $caja = $cajaAbierta[0];
+
+        $dineroParaCerrar = $caja->dinerofin + $caja->dinerocredito + $caja->dineroini;
+
+        if (!empty($aceptaDescuadre)) {
+            // Si se acepta el descuadre, calcularlo y cerrar la caja
+            $caja->descuadre = abs($dineroParaCerrar - $dineroFinal);
+            $caja->dinerocierre = $dineroParaCerrar;
+            $caja->camarerofin = $camarero;
+            $caja->fechahoracierre = date('Y-m-d H:i:s');
+            $caja->save();
+
+            echo json_encode(['status' => 'success']);
+            exit;
+        } elseif ($dineroParaCerrar === $dineroFinal) {
+            // Si el dinero coincide, cerrar sin descuadre
+            $caja->descuadre = 0;
+            $caja->dinerocierre = $dineroFinal;
+            $caja->camarerofin = $camarero;
+            $caja->fechahoracierre = date('Y-m-d H:i:s');
+            $caja->save();
+
+            echo json_encode(['status' => 'success']);
+            exit;
+        }
+
+        echo json_encode(['status' => 'error', 'message' => 'No se pudo cerrar la caja.']);
+    }
+
+    protected function createView() {
+        $this->setTemplate($this->turnoAbierto() ? 'DixTPV/Hosteleria/Ventas/DixTPV' : 'DixTPV/Hosteleria/Ventas/nuevoTurno');
+    }
+
+    protected function execAfterAction($action) {
+        switch ($action) {
+            case 'getFamilyProducts':
+                $htmlCode = $this->renderFamilyProducts();
+                $this->setTemplate(false);
+                $this->response->setContent(json_encode([
+                    'htmlFamily' => $htmlCode,
+                    'subamilias' => 'ok',
+                    'resultado' => 'OK'], 1));
+                break;
+
+            case 'aparcarCuenta':
+                $this->aparcarCuenta();
+                $this->setTemplate(false);
+                $this->response->setContent(json_encode([
+                    'success' => 'ok',
+                    'resultado' => 'OK'], 1));
+                break;
+
+            case 'recuperarAparcado':
+                $this->recuperarAparcado();
+                break;
+
+            case 'modificarProducto':
+                $this->modificarProducto();
+                break;
+
+            case 'abrirCaja':
+                $this->abrirCaja();
+                $this->setTemplate(false);
+                $this->response->setContent(json_encode([
+                    'success' => 'ok',
+                    'resultado' => 'OK'], 1));
+                break;
+
+            case 'cobrarCuenta':
+                $this->cobrarCuenta();
+                $this->setTemplate(false);
+                $this->response->setContent(json_encode([
+                    'success' => 'ok',
+                    'resultado' => 'OK'], 1));
+                break;
+
+            case 'cobrarCuentaDividida':
+                $this->cobrarCuentaDividida();
+                $this->setTemplate(false);
+                $this->response->setContent(json_encode([
+                    'success' => 'ok',
+                    'resultado' => 'OK'], 1));
+                break;
+
+            case 'cerrarCaja':
+                $this->cerrarCaja();
+                $this->setTemplate(false);
+                $this->response->setContent(json_encode([
+                    'success' => 'ok',
+                    'resultado' => 'OK'], 1));
+                break;
+
+            case 'cerrarCajaAuto':
+                $this->cerrarCajaAuto();
+                $this->setTemplate(false);
+                $this->response->setContent(json_encode([
+                    'success' => 'ok',
+                    'resultado' => 'OK'], 1));
+                break;
+
+            case 'seleccionTerminal':
+                $this->seleccionTerminal();
+                $this->setTemplate(false);
+                $this->response->setContent(json_encode([
+                    'success' => 'ok',
+                    'resultado' => 'OK'], 1));
+                break;
+
+            case 'obtenerMesasDisponibles':
+                $this->obtenerMesasDisponibles();
+                $this->setTemplate(false);
+                break;
+
+            case 'export':
+                $option = $this->request->get('option', '');
+                if ($option === 'Ticket') {
+                    $response = $this->printTicket();
+                    $action = '';
+                    $this->setTemplate(false);
+                    $this->createView();
+                }
+                break;
+        }
+    }
+
+    public function printTicket() {
+
+        $document = new \FacturaScripts\Dinamic\Model\FacturaCliente;
+        $template = $this->request->get('template');
+        $template = 'FacturaScripts\Dinamic\Lib\Ticket\Builder\\' . $template;
+        $id = $this->request->get('code', '');
+        if ($id == '') {
+
+            $document->loadFromCode('', [new DataBaseWhere('idfactura', 0, '>')], ['idfactura' => 'DESC']);
+        }
+
+        $ticketWidth = Tools::settings('ticket', 'linelength', 50);
+        $format = new FormatoTicket();
+        $format->loadFromCode('', [], ['id' => 'ASC']);
+        $ticketBuilder = new $template($document, $format);
+
+        $response = [
+            'print_job_id' => PrintingService::newPrintJob($ticketBuilder)
+        ];
+
+        return json_encode($response, 1);
+    }
+
+    private function abrirCaja() {
+        $this->startSession();
+
+        $dineroManejado = floatval($this->request->get('dineroManejado'));
+        $tipoapertura = $this->request->get('tipoapertura');
+        $caja = $this->loadActiveCaja();
+
+        $caja->dinerofin += ($tipoapertura === "1") ? $dineroManejado : -$dineroManejado;
+        $caja->save();
+    }
+
+    private function loadActiveCaja(): DixTPVCaja {
+        $caja = new DixTPVCaja();
+        if (!empty($_SESSION['idcaja'])) {
+            $idcaja = $_SESSION['idcaja'];
+        } else {
+            $idcaja = $this->idCaja;
+        }
+
+        $caja->loadFromCode($idcaja);
+        return $caja;
+    }
+
+    public function seleccionTerminal() {
+        $dineroInicial = $this->request->get('dinero_inicial');
+        $selectedTerminalId = $this->request->get('selectedTerminalId');
+
+        $fechaHoraIni = date('Y-m-d H:i:s');
+
+        $nuevaCaja = new DixTPVCaja();
+        $nuevaCaja->dineroini = $dineroInicial;
+        //$nuevaCaja->dinerofin = $dineroInicial;
+        $nuevaCaja->fechahoraapertura = $fechaHoraIni;
+        $nuevaCaja->pertenenciaterminal = $selectedTerminalId;
+        if ($nuevaCaja->save()) {
+            $nuevaCaja->nombre = $nuevaCaja->id . $nuevaCaja->pertenenciaterminal;
+            $nuevaCaja->save();
+        }
+
+        $_SESSION['cajaActivaFecha'] = $fechaHoraIni;
+        $_SESSION['idcaja'] = $nuevaCaja->idcaja;
+        $this->idCaja = $nuevaCaja->idcaja;
+        $this->cajaActivaFecha = $fechaHoraIni;
+    }
+
+    public function modificarProducto() {
+        $referencia = $this->request->get('referencia');
+        $precio = $this->request->get('pvp');
+        $inputCant = $this->request->get('inputCant');
+        $descripcion = $this->request->get('descripcion');
+
+        $variante = new Variante();
+        $variante->loadFromCode('', [new DataBaseWhere('referencia', $referencia)]);
+        $variante->precio = floatval($precio);
+        $variante->save();
+
+        $this->setTemplate(false);
+        $htmlCode = $this->renderFamilyProducts();
+
+        $this->response->setContent(json_encode([
+            'htmlFamily' => $htmlCode,
+            'subamilias' => 'ok',
+            'success' => 'ok',
+            'resultado' => 'OK'], 1));
+    }
+
+    public function recuperarAparcado() {
+        $idcomanda = $this->request->get('idcomanda');
+
+        // Cargar la comanda utilizando el ID
+        $comanda = new DixTPVComanda();
+        $comanda->loadFromCode($idcomanda);
+
+        // Cargar los detalles de la comanda
+        $whereDetails = [new DataBaseWhere('idcomanda', $idcomanda)];
+        $detalles = new DixDetailComanda();
+        $detalles = $detalles->all($whereDetails, [], 0, 0);
+
+        // Inicializar un array para almacenar los productos
+        $productos = [];
+
+        // Iterar sobre los detalles de la comanda para recuperar la información de cada producto
+        foreach ($detalles as $detalle) {
+            // Obtener la variante correspondiente al idproducto del detalle
+            $whereVariant = [new DataBaseWhere('idproducto', $detalle->idproducto)];
+            $variant = new Variante();
+            $variant = $variant->all($whereVariant, [], 0, 0);
+            $varian = $variant[0];
+
+            // Cargar el producto correspondiente a la variante
+            $whereProduct = [new DataBaseWhere('idproducto', $varian->idproducto)];
+            $producto = new Producto();
+            $producto = $producto->all($whereProduct, [], 0, 0);
+            $prod = $producto[0];
+
+            $productos[] = [
+                'descripcion' => $prod->descripcion, // Nombre de la variante
+                'pvp' => $varian->precio,
+                'cantidad' => $detalle->cantidad,
+                'referencia' => $varian->referencia
+            ];
+        }
+
+        $this->setTemplate(false);
+        $this->response->setContent(json_encode([
+            'productos' => $productos, // Añadir los productos a la respuesta
+            'success' => 'ok',
+            'resultado' => 'OK'
+                        ], 1));
+    }
+
+    private function aparcarCuenta() {
+        $salon = $this->request->get('salon'); // Recuperar el salón
+        $mesa = $this->request->get('mesa'); // Recuperar la mesa
+        $cesta = $this->request->get('cesta');
+
+        $whereMesa = [new DataBaseWhere('nombre', $mesa)];
+        $mesasSeleccionada = new DixMesa();
+        $mesasSeleccionada = $mesasSeleccionada->all($whereMesa, [], 0, 0);
+        $mess = $mesasSeleccionada[0];
+
+        $comanda = new DixTPVComanda();
+
+        if ($comanda->loadFromCode('', [new DataBaseWhere('idmesa', $mess->idmesa)])) {
+            if ($comanda->delete()) {
+
+                $comanda->idsalon = $mess->idsalon;
+                $comanda->idmesa = $mess->idmesa;
+                $comanda->idcliente = 1;
+                $comanda->idestado = 1;
+
+                if ($comanda->save()) {
+                    // Recorrer los productos en la cesta
+                    foreach ($cesta as $producto) {
+
+                        $referencia = $producto['referencia'];
+
+                        $where = [new DataBaseWhere('referencia', $referencia)];
+                        $variant = new Variante();
+                        $variant = $variant->all($where, [], 0, 0);
+                        $varian = $variant[0];
+
+                        $comandaProducto = new DixDetailComanda();
+                        $comandaProducto->idcomanda = $comanda->idcomanda; // Asocia la comanda
+                        $comandaProducto->idproducto = $varian->idproducto; // ID del producto
+                        $comandaProducto->cantidad = $producto['cantidad']; // Cantidad del producto
+                        $comandaProducto->precio_unitario = $varian->precio; // Precio del producto
+                        $comandaProducto->precio_total = $producto['pvp']; // Precio del producto
+                        // Guardar el producto de la comanda
+                        if (!$comandaProducto->save()) {
+                            $llego = '';
+                        }
+                    }
+                }
+            }
+        } else {
+
+            $comanda->idsalon = $mess->idsalon;
+            $comanda->idmesa = $mess->idmesa;
+            $comanda->idcliente = 1;
+            $comanda->idestado = 1;
+
+            if ($comanda->save()) {
+                // Recorrer los productos en la cesta
+                foreach ($cesta as $producto) {
+
+                    $referencia = $producto['referencia'];
+
+                    $where = [new DataBaseWhere('referencia', $referencia)];
+                    $variant = new Variante();
+                    $variant = $variant->all($where, [], 0, 0);
+                    $varian = $variant[0];
+
+                    $comandaProducto = new DixDetailComanda();
+                    $comandaProducto->idcomanda = $comanda->idcomanda; // Asocia la comanda
+                    $comandaProducto->idproducto = $varian->idproducto; // ID del producto
+                    $comandaProducto->cantidad = $producto['cantidad']; // Cantidad del producto
+                    $comandaProducto->precio_unitario = $varian->precio; // Precio del producto
+                    $comandaProducto->precio_total = $producto['pvp']; // Precio del producto
+                    // Guardar el producto de la comanda
+                    if (!$comandaProducto->save()) {
+                        $llego = '';
+                    }
+                }
+            }
+        }
+
+        if (!empty($cesta)) {
+            // Puedes almacenar los datos del salón y mesa en la sesión
+            if (session_status() == PHP_SESSION_NONE) {
+                session_start();
+            }
+
+            $_SESSION['salonSeleccionado'] = $salon;
+            $_SESSION['mesaSeleccionada'] = $mesa;
+
+            $this->response->setContent(json_encode(['success' => true, 'message' => 'Cesta aparcada correctamente.'], 1));
+        } else {
+            $this->response->setContent(json_encode(['success' => false, 'message' => 'No se recibió ninguna cesta.'], 1));
+        }
+    }
+
+    private function getFamilyProducts() {
+        $codfamilia = $this->request->get('codfamilia');
+        $where = [new DataBaseWhere('codfamilia', $codfamilia)];
+        $productModal = new Producto();
+        $productos = $productModal->all($where, [], 0, 0);
+        $dataProducts = [];
+        foreach ($productos as $producto) {
+            $variants = $producto->getVariants();
+            foreach ($variants as $variant) {
+                $dataProducts[] = [
+                    'product' => $producto,
+                    'variant' => $variant,
+                    'pvp' => $variant->priceWithTax(),
+                    'images' => $variant->getImages(),
+                    'description' => $variant->description(),
+                ];
+            }
+        }
+        return $dataProducts;
+    }
+
+    private function renderFamilyProducts() {
+        $products = $this->getFamilyProducts();
+        $dataForTwig = ['products' => $products];
+
+        $htmlCode = Html::render('DixTPV/Hosteleria/Ventas/Vistas/familyProducts.html.twig', $dataForTwig);
+        return $htmlCode;
+    }
+
+    private function cobrarCuenta() {
+
+        $salon = $this->request->get('salon'); // Recuperar el salón
+        $mesa = $this->request->get('mesa'); // Recuperar la mesa
+        $cesta = $this->request->get('cesta');
+        $formapago = $this->request->get('formapago');
+        //$tipodoc = $this->request->get('FormatoDocumento');
+        $precioacobrar = $this->request->get('precioacobrar');
+
+        $pago = new FormaPago();
+        $pago->loadFromCode($formapago);
+        $whereMesa = [new DataBaseWhere('nombre', $mesa)];
+        $mesasSeleccionada = new DixMesa();
+        $mesasSeleccionada = $mesasSeleccionada->all($whereMesa, [], 0, 0);
+        $mess = $mesasSeleccionada[0];
+
+        $comanda = new DixTPVComanda();
+
+        if ($comanda->loadFromCode('', [new DataBaseWhere('idmesa', $mess->idmesa)])) {
+            $comanda->idsalon = '';
+            $comanda->idmesa = '';
+            $comanda->save();
+        } else {
+            $comanda->idcliente = 1;
+            //$comanda->idestado = 1;
+
+            if ($comanda->save()) {
+                // Recorrer los productos en la cesta
+                foreach ($cesta as $producto) {
+
+                    $referencia = $producto['referencia'];
+
+                    $where = [new DataBaseWhere('referencia', $referencia)];
+                    $variant = new Variante();
+                    $variant = $variant->all($where, [], 0, 0);
+                    $varian = $variant[0];
+
+                    $comandaProducto = new DixDetailComanda();
+                    $comandaProducto->idcomanda = $comanda->idcomanda; // Asocia la comanda
+                    $comandaProducto->idproducto = $varian->idproducto; // ID del producto
+                    $comandaProducto->cantidad = $producto['cantidad']; // Cantidad del producto
+                    $comandaProducto->precio_unitario = $varian->precio; // Precio del producto
+                    $comandaProducto->precio_total = $producto['pvp']; // Precio del producto
+                    // Guardar el producto de la comanda
+                    if (!$comandaProducto->save()) {
+                        $llego = '';
+                    }
+                }
+            }
+        }
+
+        if (!empty($_SESSION['idcaja'])) {
+            $idcaja = $_SESSION['idcaja'];
+        } else {
+            $idcaja = $this->idCaja;
+        }
+
+        $caja = new DixTPVCaja();
+        $caja->loadFromCode($idcaja);
+
+        if ($pago->efectivo) {
+            $guardado = $caja->dinerofin;
+            $caja->dinerofin = $guardado + $precioacobrar;
+        } else {
+            $guardado = $caja->dinerocredito;
+            $caja->dinerocredito = $guardado + $precioacobrar;
+        }
+
+        $terminal = new DixTerminal();
+        $terminal->loadFromCode($caja->pertenenciaterminal);
+        $this->generarDoc($terminal->doctype, $comanda->idcomanda, $formapago);
+
+        $caja->save();
+    }
+
+    private function cobrarCuentaDividida() {
+        $salon = $this->request->get('salon'); // Recuperar el salón
+        $mesa = $this->request->get('mesa'); // Recuperar la mesa
+        $cesta = $this->request->get('cesta');
+        $formapago = $this->request->get('formapago');
+        //$tipodoc = $this->request->get('FormatoDocumento');
+        $precioacobrar = $this->request->get('precioacobrar');
+
+        $whereMesa = [new DataBaseWhere('nombre', $mesa)];
+        $mesasSeleccionada = new DixMesa();
+        $mesasSeleccionada = $mesasSeleccionada->all($whereMesa, [], 0, 0);
+        $mess = $mesasSeleccionada[0];
+
+        $comanda = new DixTPVComanda();
+
+        if ($comanda->loadFromCode('', [new DataBaseWhere('idmesa', $mess->idmesa)])) {
+            $comanda->idsalon = '';
+            $comanda->idmesa = '';
+            $comanda->save();
+        } else {
+            $comanda->idcliente = 1;
+            //$comanda->idestado = 1;
+
+            if ($comanda->save()) {
+                // Recorrer los productos en la cesta
+                foreach ($cesta as $producto) {
+
+                    $referencia = $producto['referencia'];
+
+                    $where = [new DataBaseWhere('referencia', $referencia)];
+                    $variant = new Variante();
+                    $variant = $variant->all($where, [], 0, 0);
+                    $varian = $variant[0];
+
+                    $comandaProducto = new DixDetailComanda();
+                    $comandaProducto->idcomanda = $comanda->idcomanda; // Asocia la comanda
+                    $comandaProducto->idproducto = $varian->idproducto; // ID del producto
+                    $comandaProducto->cantidad = $producto['cantidad']; // Cantidad del producto
+                    $comandaProducto->precio_unitario = $varian->precio; // Precio del producto
+                    $comandaProducto->precio_total = $producto['pvp']; // Precio del producto
+                    // Guardar el producto de la comanda
+                    if (!$comandaProducto->save()) {
+                        $llego = '';
+                    }
+                }
+            }
+        }
+
+        if (!empty($_SESSION['idcaja'])) {
+            $idcaja = $_SESSION['idcaja'];
+        } else {
+            $idcaja = $this->idCaja;
+        }
+        $caja = new DixTPVCaja();
+        $caja->loadFromCode($idcaja);
+        $guardado = $caja->dinerofin;
+
+        $terminal = new DixTerminal();
+        $terminal->loadFromCode($caja->pertenenciaterminal);
+
+        $this->generarDocDiv($terminal->doctype, $cesta, $formapago);
+
+        $caja->dinerofin = $guardado + $precioacobrar;
+        $caja->save();
+    }
+
+    private function generarDoc($doctype, $comandaId, $formapago) {
+        $resultado = false;
+
+        switch ($doctype) {
+            case "FacturaCliente":
+                $resultado = UtilsTPV::generarFactura($comandaId, $formapago);
+                break;
+            case "AlbaranCliente":
+                $resultado = UtilsTPV::generarAlbaran($comandaId, $formapago);
+                break;
+            case "PedidoCliente":
+                $resultado = UtilsTPV::generarPedido($comandaId, $formapago);
+                break;
+            case "PresupuestoCliente":
+                $resultado = UtilsTPV::generarPresupuesto($comandaId, $formapago);
+                break;
+            default:
+                error_log("Tipo de documento no válido: $doctype");
+                return false;
+        }
+        return $resultado;
+    }
+
+    private function generarDocDiv($doctype, $cesta, $formapago) {
+        $resultado = false;
+
+        switch ($doctype) {
+            case "FacturaCliente":
+                $resultado = UtilsTPV::generarFacturaDiv($cesta, $formapago);
+                break;
+            case "AlbaranCliente":
+                $resultado = UtilsTPV::generarAlbaranDiv($cesta, $formapago);
+                break;
+            case "PedidoCliente":
+                $resultado = UtilsTPV::generarPedidoDiv($cesta, $formapago);
+                break;
+            case "PresupuestoCliente":
+                $resultado = UtilsTPV::generarPresupuestoDiv($cesta, $formapago);
+                break;
+            default:
+                error_log("Tipo de documento no válido: $doctype");
+                return false;
+        }
+        return $resultado;
+    }
+
+    public function obtenerMesasDisponibles() {
+        $mesas = new DixMesa();
+        $mesasDisponibles = $mesas->all([new DataBaseWhere('ocupada', '0')], [], 0, 0);
+
+        $listaMesas = [];
+        foreach ($mesasDisponibles as $mesa) {
+            $listaMesas[] = $mesa->nombre;
+        }
+
+        $this->response->setContent(json_encode($listaMesas));
+    }
+}

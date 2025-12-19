@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<table>
+    <column>
+        <name>idbillete</name>
+        <type>serial</type>
+        <null>NO</null>
+    </column>
+    <column>
+        <name>coddivisa</name>
+        <type>character varying(3)</type>
+        <null>NO</null>
+    </column>
+    <column>
+        <name>icono</name>
+        <type>character varying (50)</type>
+        <null>YES</null>
+    </column>
+    <column>
+        <name>valor</name>
+        <type>integer</type>
+        <null>NO</null>
+    </column>
+    <column>
+        <name>cantidad</name>
+        <type>integer</type>
+        <null>YES</null>
+    </column>
+    <column>
+        <name>pertenenciacaja</name>
+        <type>character varying(250)</type>
+        <null>NO</null>
+    </column>
+    <constraint>
+        <name>dix_billetes_pkey</name>
+        <type>PRIMARY KEY (idbillete)</type>
+    </constraint>
+    <!--Añadi claves foraneas pendientes de revision-->
+    <constraint>
+        <name>dix_billetes_divisas</name>
+        <type>FOREIGN KEY (coddivisa) REFERENCES divisas (coddivisa) ON UPDATE CASCADE ON DELETE RESTRICT </type>
+    </constraint>
+</table>

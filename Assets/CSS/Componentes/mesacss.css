@@ -1,0 +1,310 @@
+.tpv-floor-layout {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    color: #2f2f2f;
+}
+
+.tpv-floor-sidebar {
+    flex: 0 0 220px;
+    background: linear-gradient(135deg, #ffe8c6, #ffd09c);
+    border-radius: 18px;
+    padding: 1.25rem;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+}
+
+.tpv-floor-sidebar__title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.tpv-floor-sidebar__list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.salon-card {
+    border: none;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.35);
+    padding: 0.85rem 1rem;
+    font-weight: 600;
+    color: #3a2c12;
+    text-align: left;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.25s ease;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.salon-card:hover {
+    transform: translateX(4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.18);
+    background: rgba(255, 255, 255, 0.55);
+}
+
+.salon-card.salon-seleccionado {
+    background: linear-gradient(135deg, #ff8f5a, #ffb347);
+    color: #fff;
+    box-shadow: 0 16px 24px rgba(255, 140, 64, 0.45);
+}
+
+.salon-card__name {
+    font-size: 1rem;
+}
+
+.salon-card__description {
+    font-size: 0.75rem;
+    opacity: 0.8;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.tpv-floor-stage {
+    flex: 1 1 420px;
+    background: #fff7ec;
+    border-radius: 22px;
+    padding: 1.5rem;
+    box-shadow: 0 18px 36px rgba(0, 0, 0, 0.14);
+    display: flex;
+    flex-direction: column;
+    min-width: 320px;
+}
+
+.tpv-floor-stage__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.tpv-floor-stage__title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.tpv-floor-stage__subtitle {
+    margin: 0.4rem 0 0;
+    font-size: 0.9rem;
+    color: #6c5c3a;
+}
+
+.tpv-floor-stage__legend {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #5d4c2f;
+}
+
+.legend-dot {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    margin-right: 0.35rem;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.4);
+}
+
+.legend-dot--free {
+    background: linear-gradient(145deg, #68d391, #4caf50);
+}
+
+.legend-dot--busy {
+    background: linear-gradient(145deg, #f87171, #e63946);
+}
+
+.tpv-floor-canvas-wrapper {
+    flex: 1;
+    background: #fef4e8;
+    border-radius: 18px;
+    padding: 1rem;
+    position: relative;
+    box-shadow: inset 0 4px 18px rgba(0, 0, 0, 0.08);
+}
+
+.tpv-floor-canvas {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 460px;
+    border-radius: 14px;
+    background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0) 60%),
+        radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.55), transparent 70%),
+        repeating-linear-gradient(0deg, rgba(255, 198, 146, 0.25), rgba(255, 198, 146, 0.25) 35px, transparent 36px, transparent 70px),
+        #f7ddbc;
+    overflow: hidden;
+}
+
+.mesa-card {
+    position: absolute;
+    width: 122px;
+    height: 122px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.28);
+    border-radius: 24px;
+    border: 3px solid transparent;
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.18);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    cursor: grab;
+    user-select: none;
+    color: #362715;
+    touch-action: none;
+    --mesa-surface: #d5c9bc;
+    --mesa-seat: #ffffff;
+    --mesa-seat-border: rgba(85, 64, 44, 0.28);
+}
+
+.mesa-card:hover {
+    transform: translate(-50%, -50%) scale(1.04);
+    box-shadow: 0 22px 36px rgba(0, 0, 0, 0.24);
+    border-color: rgba(255, 255, 255, 0.45);
+}
+
+.mesa-card:focus-visible {
+    outline: 3px solid rgba(255, 191, 102, 0.85);
+    outline-offset: 6px;
+}
+
+.mesa-card[data-dragging="true"] {
+    cursor: grabbing;
+    box-shadow: 0 28px 44px rgba(0, 0, 0, 0.32);
+}
+
+.mesa-card.mesa-disponible {
+    --mesa-surface: #5cb85c;
+    --mesa-seat-border: rgba(60, 120, 68, 0.38);
+    color: #ffffff;
+}
+
+.mesa-card.mesa-ocupada {
+    --mesa-surface: #d9534f;
+    --mesa-seat-border: rgba(169, 39, 35, 0.5);
+    color: #fff7ec;
+}
+
+.mesa-card__svg {
+    width: 88%;
+    height: 88%;
+}
+
+.mesa-card.mesa-shape-barra .mesa-card__svg {
+    width: 94%;
+}
+
+.mesa-card__table-surface {
+    fill: var(--mesa-surface);
+    stroke: rgba(0, 0, 0, 0.16);
+    stroke-width: 5;
+}
+
+.mesa-card.mesa-ocupada .mesa-card__table-surface {
+    stroke: rgba(255, 255, 255, 0.26);
+}
+
+.mesa-card__chair rect {
+    fill: var(--mesa-seat);
+    stroke: var(--mesa-seat-border);
+    stroke-width: 3;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.18));
+    rx: 5;
+    ry: 5;
+}
+
+.mesa-card__label {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.045em;
+    fill: currentColor;
+    paint-order: stroke;
+    stroke: rgba(0, 0, 0, 0.18);
+    stroke-width: 1.4;
+}
+
+.mesa-card__seats-count {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    fill: currentColor;
+    opacity: 0.8;
+}
+
+.tpv-floor-stage__footer {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.tpv-floor-selection {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #42331b;
+    padding: 0.65rem 1rem;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 12px;
+    box-shadow: inset 0 0 0 1px rgba(255, 150, 90, 0.2);
+    min-width: 220px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+@media (max-width: 992px) {
+    .tpv-floor-layout {
+        flex-direction: column;
+    }
+
+    .tpv-floor-sidebar {
+        flex: 1 1 auto;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .tpv-floor-sidebar__list {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .salon-card {
+        flex: 1 1 calc(50% - 0.5rem);
+    }
+
+    .tpv-floor-stage__header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+@media (max-width: 576px) {
+    .mesa-card {
+        width: 94px;
+        height: 94px;
+    }
+
+    .mesa-card__label {
+        font-size: 14px;
+    }
+
+    .tpv-floor-canvas {
+        min-height: 360px;
+    }
+}

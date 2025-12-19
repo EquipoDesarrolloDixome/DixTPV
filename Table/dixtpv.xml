@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<table>
+    <column>
+        <name>active</name>
+        <type>boolean</type>
+        <default>true</default>
+        <null>NO</null>
+    </column>
+    <column>
+        <name>adddiscount</name>
+        <type>boolean</type>
+        <default>false</default>
+    </column>
+    <column>
+        <name>adddiscount1</name>
+        <type>boolean</type>
+        <default>false</default>
+    </column>
+    <column>
+        <name>changeprice</name>
+        <type>boolean</type>
+        <default>false</default>
+    </column>
+    <column>
+        <name>codalmacen</name>
+        <type>character varying(4)</type>
+    </column>
+    <column>
+        <name>codcliente</name>
+        <type>character varying(10)</type>
+    </column>
+    <column>
+        <name>coddivisa</name>
+        <type>character varying(3)</type>
+    </column>
+    <column>
+        <name>codpago</name>
+        <type>character varying(10)</type>
+    </column>
+    <column>
+        <name>codserie</name>
+        <type>character varying(4)</type>
+    </column>
+    <column>
+        <name>doctype</name>
+        <type>character varying(30)</type>
+    </column>
+    <column>
+        <name>grouplines</name>
+        <type>boolean</type>
+        <default>true</default>
+    </column>
+    <column>
+        <name>idempresa</name>
+        <type>integer</type>
+    </column>
+    <column>
+        <name>idtpv</name>
+        <type>serial</type>
+        <null>NO</null>  <!-- No debe permitir valores nulos -->
+    </column>
+    <column>
+        <name>idprinter</name>
+        <type>integer</type>
+    </column>
+    <column>
+        <name>listtype</name>
+        <type>character varying(15)</type>
+    </column>
+    <column>
+        <name>nametpv</name>
+        <type>character varying(100)</type>
+        <null>NO</null>
+    </column>
+    <column>
+        <name>preticket</name>
+        <type>boolean</type>
+        <default>false</default>
+    </column>
+    <column>
+        <name>sound</name>
+        <type>boolean</type>
+        <default>false</default>
+    </column>
+    <column>
+        <name>ticketformat</name>
+        <type>character varying(50)</type>
+    </column>
+    <column>
+        <name>idcomanda</name>
+        <type>integer</type>
+        <null>YES</null>
+    </column>
+    <column>
+        <name>tipocomandero</name>
+        <type>integer</type>
+    </column>
+    <column>
+        <name>impresion</name>
+        <type>smallint</type>
+        <default>1</default>
+    </column>
+    <column>
+        <name>mostrarcamareros</name>
+        <type>boolean</type>
+    </column>
+    <column>
+        <name>mostrardescripcion</name>
+        <type>boolean</type>
+        <default>false</default>
+    </column>
+    <column>
+        <name>mostrarbuscador</name>
+        <type>boolean</type>
+        <default>true</default>
+    </column>
+    <column>
+        <name>cardsize</name>
+        <type>character varying(10)</type>
+        <default>'medium'</default>
+    </column>
+    <column>
+        <name>dineroapertura</name>
+        <type>double precision</type>
+        <default>0</default>
+    </column>
+    <column>
+        <name>hosteleria</name>
+        <type>boolean</type>
+        <default>true</default>
+    </column>
+    <constraint>
+        <name>dixtpv_pkey</name>
+        <type>PRIMARY KEY (idtpv)</type>
+    </constraint>
+    <constraint>
+        <name>dixtpv_codalmacen</name>
+        <type>FOREIGN KEY (codalmacen) REFERENCES almacenes (codalmacen) ON UPDATE CASCADE ON DELETE RESTRICT </type>
+    </constraint>
+    <constraint>
+        <name>dixtpv_codcliente</name>
+        <type>FOREIGN KEY (codcliente) REFERENCES clientes (codcliente) ON UPDATE CASCADE ON DELETE RESTRICT </type>
+    </constraint>
+    <constraint>
+        <name>dixtpv_coddivisa</name>
+        <type>FOREIGN KEY (coddivisa) REFERENCES divisas (coddivisa) ON UPDATE CASCADE ON DELETE RESTRICT </type>
+    </constraint>
+    <constraint>
+        <name>dixtpv_codpago</name>
+        <type>FOREIGN KEY (codpago) REFERENCES formaspago (codpago) ON UPDATE CASCADE ON DELETE RESTRICT </type>
+    </constraint>
+    <constraint>
+        <name>dixtpv_codserie</name>
+        <type>FOREIGN KEY (codserie) REFERENCES series (codserie) ON UPDATE CASCADE ON DELETE RESTRICT </type>
+    </constraint>
+    <constraint>
+        <name>dixtpv_idempresa</name>
+        <type>FOREIGN KEY (idempresa) REFERENCES empresas (idempresa) ON UPDATE CASCADE ON DELETE RESTRICT </type>
+    </constraint>
+    <constraint>
+        <name>dixtpv_idcomanda</name>
+        <type>FOREIGN KEY (idcomanda) REFERENCES dix_comanda (idcomanda) ON UPDATE CASCADE ON DELETE RESTRICT </type>
+    </constraint>
+    <!--    <constraint>
+        <name>dixtpv_tipocomandero</name>
+        <type>FOREIGN KEY (tipocomandero) REFERENCES dix_comanderos (idcomandero) ON UPDATE CASCADE ON DELETE RESTRICT </type>
+    </constraint>-->
+
+</table>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<view>
+    <columns>
+        <group name="data" numcolumns="12">
+            <column name="box-id" order="80" display ="none">
+                <widget type="integer" fieldname="idcaja" />
+            </column>
+            <column name="nombre" order="75">
+                <widget type="text" fieldname="nombre" />
+            </column>
+            <column name="pertenencia-terminal" order="80" numcolumns="3">
+                <widget type="select" fieldname="pertenenciaterminal"> 
+                    <values source="dixtpv" fieldcode="idtpv" fieldtitle="nametpv" />
+                </widget>
+            </column>
+            <column name="dinero-inicio" order="90" >
+                <widget type="double" fieldname="dineroini" />
+            </column>
+            <column name="dinero-fin" order="100" >
+                <widget type="double" fieldname="dinerocierre" />
+            </column>
+            <column name="descuadre" order="110" >
+                <widget type="double" fieldname="descuadre" />
+            </column>
+            <column name="fechahoraapertura" order="120" >
+                <widget type="datetime" fieldname="fechahoraapertura" />
+            </column>
+            <column name="fechahoracierre" order="130" >
+                <widget type="datetime" fieldname="fechahoracierre" />
+            </column>
+            <column name="camarero-ini" order="140" >
+                <widget type="text" fieldname="camareroini" />
+            </column>
+            <column name="camarero-fin" order="150" >
+                <widget type="text" fieldname="camarerofin" />
+            </column>        
+        </group>
+    </columns>
+</view> 

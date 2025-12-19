@@ -1,0 +1,67 @@
+
+
+<div id="modalCerrarCaja" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cerrar Caja</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <label for="dineroFinal">Dinero final en caja:</label>
+                <input type="number" id="dineroFinal" class="form-control" placeholder="Ingrese el monto final" onclick="seleccionarInputTer(this);"/>
+                <div class="center" style="margin-top: 15px;">
+                    <div class="row">
+                        <div class="col-4 text-center" onclick="agregarNumeroTer(1);">
+                            <button class="btn btn-light calculator-button" >1</button>
+                        </div>
+                        <div class="col-4 text-center" onclick="agregarNumeroTer(2);">
+                            <button class="btn btn-light calculator-button">2</button>
+                        </div>
+                        <div class="col-4 text-center" onclick="agregarNumeroTer(3);">
+                            <button class="btn btn-light calculator-button">3</button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-4 text-center" onclick="agregarNumeroTer(4);">
+                            <button class="btn btn-light calculator-button">4</button>
+                        </div>
+                        <div class="col-4 text-center" onclick="agregarNumeroTer(5);">
+                            <button class="btn btn-light calculator-button">5</button>
+                        </div>
+                        <div class="col-4 text-center" onclick="agregarNumeroTer(6);">
+                            <button class="btn btn-light calculator-button">6</button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-4 text-center" onclick="agregarNumeroTer(7);">
+                            <button class="btn btn-light calculator-button">7</button>
+                        </div>
+                        <div class="col-4 text-center" onclick="agregarNumeroTer(8);">
+                            <button class="btn btn-light calculator-button">8</button>
+                        </div>
+                        <div class="col-4 text-center" onclick="agregarNumeroTer(9);">
+                            <button class="btn btn-light calculator-button">9</button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-4 offset-4 text-center" onclick="agregarNumeroTer(0);">
+                            <button class="btn btn-light calculator-button">0</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="procesarCerrarCajaAuto();">Cierre Auto.</button>
+                <button type="button" class="btn btn-primary" onclick="procesarCerrarCaja();">Guardar</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+</script>

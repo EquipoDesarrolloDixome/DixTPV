@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<view>
+    <columns>
+        <group name="data" numcolumns="12">
+            <column name="idmesa" order="100" display="none">
+                <widget type="number" fieldname="idmesa" readonly="true"/>
+            </column>
+            <column name="idsalon" order="100" display='none'>
+                <widget type="number" fieldname="idsalon" readonly="true"/>
+            </column>
+            <column name="idcomanda " order="100" display='none' >
+                <widget type="number" fieldname="idcomanda" readonly="true"/>
+            </column>
+            <column name="num-mesa" order="110" numcolumns="3">
+                <widget type="text" fieldname="nombre"/>
+            </column>
+            <column name="tipo-mesa" order="120" titleurl="ListDixTipoMesa" numcolumns="3">
+                <widget type="select" fieldname="tipo_mesa" required="true">
+                    <values source="dix_tipo_mesa" fieldcode="idtipomesa" fieldtitle="nombre"/> 
+                </widget>
+            </column>
+            <column name="comansales" order="115" numcolumns="3">
+                <widget type="number" fieldname="comensales" min="0"/>
+            </column>
+            <column name="comanda" order="130" numcolumns="3">
+                <widget type="text" fieldname="idcomanda"  readonly="true"/>
+            </column>
+        </group>            
+        <group name="data1" numcolumns="12">
+            <column name="observaciones" order="120">
+                <widget type="textarea" fieldname="observaciones"/>
+            </column>              
+        </group>
+    </columns>
+</view>

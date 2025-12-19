@@ -1,0 +1,25 @@
+{% set showDesc = showDescription is defined ? showDescription : (fsc.mostrarDescripcionCartas ?? false) %}
+{% set hasImage = product.imageUrl ? true : false %}
+{% set showDescOnly = showDesc %}
+<div class="prod-card {{ product.imageUrl ? '' : 'prod-card--no-image' }} {{ showDescOnly ? 'prod-card--desc-only' : '' }}" 
+onclick="annadir('{{ product.variant.referencia|e('js') }}', '{{ product.variant.description|e('js') }}', '{{ product.variant.precio|e('js') }}', '{{ product.codimpuesto|e('js') }}', 
+'{{ product.variant.stockfis|e('js') }}', {{ product.ventasinstock|e('js') }});">
+    {% if showDescOnly %}
+        <div class="prod-card-desc-only">
+            {{ product.variant.description }}
+        </div>
+    {% elseif hasImage %}
+        <div class="prod-card-image">
+            <img src="{{ product.imageUrl }}" alt="{{ product.variant.description|e }}">
+        </div>
+    {% else %}
+        <div class="prod-card-image no-image">
+            {{ product.variant.description|length > 0 ? product.variant.description|slice(0,2)|upper : '??' }}
+        </div>
+    {% endif %}
+    {% if not showDescOnly %}
+        <div class="productoClaseVariante prod-card-label">
+            {{ product.variant.description|length > 12 ? product.variant.description|slice(0,12)  ~ '...' : product.variant.description }}
+        </div>
+    {% endif %}
+</div> 

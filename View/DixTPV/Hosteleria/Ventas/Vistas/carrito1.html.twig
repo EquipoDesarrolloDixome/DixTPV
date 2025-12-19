@@ -1,0 +1,50 @@
+<div id="panel_cobro_completo" style="margin-right: 15px">
+    <div class="row">
+        <!-- Selector Normal / Dividir -->
+        <div class="col-6 col-sm-6 col-md-6">
+            <div class="btn-group-toggle" role="group" aria-label="opciones de cobro">
+                <label class="btn btn-outline-primary active" id="lblbtnnormal" onclick="toggleNormal();">
+                    <input type="radio" class="btn-check" name="btncobrar" id="btnnormal">
+                    Normal
+                </label>
+
+                <label class="btn btn-outline-primary" id="lblbtnDivCuenta" onclick="toggleDivCuenta();">
+                    <input type="radio" class="btn-check" name="btncobrar" id="btnDivCuenta" autocomplete="off">
+                    Div Cuenta
+                </label>
+            </div>
+        </div>
+
+        <!-- Tabla con totales -->
+<div class="col-6 col-sm-6 col-md-6 d-flex align-items-start justify-content-end">
+    <table class="table table-sm table-bordered text-center mb-0" style="width: auto; font-size: 0.85em;">
+        <thead>
+            <tr style="background-color: #F5A623;">
+                <th class="px-2">Total</th>
+                <th class="px-2">Cobrar</th>
+                <th class="px-2">Entregado</th>
+                <th class="px-2">Cambio</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td id="totVenta" class="px-2">0.00</td>
+                <td id="totCobrar" class="px-2">0.00</td>
+                <td id="totEntregado" class="px-2">0.00</td>
+                <td id="totCambio" class="px-2">0.00</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+
+
+    <!-- Panel de cobro completo (input cliente, formas de pago, etc.) -->
+    <div class="container-fluid mt-3">
+        <div class="row">
+            <div class="col-12">
+                {% include 'DixTPV/Hosteleria/Ventas/Componentes/cobro.html.twig' %}
+            </div>
+        </div>
+    </div>
+</div>

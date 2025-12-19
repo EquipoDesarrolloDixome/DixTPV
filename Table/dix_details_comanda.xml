@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<table>
+    <column>
+        <name>iddetalle</name>
+        <type>serial</type>
+        <null>NO</null>
+    </column>
+    <column>
+        <name>idcomanda</name>
+        <type>integer</type>
+        <null>NO</null>
+    </column>
+    <column>
+        <name>idproducto</name>
+        <type>integer</type>
+    </column>
+    <column>
+        <name>descripcion</name>
+        <type>character varying(500)</type>
+    </column>
+    <column>
+        <name>cantidad</name>
+        <type>character varying(500)</type>
+        <null>YES</null>
+        <default>1</default>
+    </column>
+    <column>
+        <name>codimpuesto</name>
+        <type>character varying(50)</type>
+        <null>YES</null>
+    </column>
+    <column>
+        <name>precio_unitario</name>
+        <type>double precision</type>
+        <null>YES</null>
+        <default>0</default>
+    </column>
+    <column>
+        <name>precio_total</name>
+        <type>double precision</type>
+        <null>YES</null>
+        <default>0</default>
+    </column>
+    <constraint>
+        <name>dix_details_comanda_pkey</name>
+        <type>PRIMARY KEY (iddetalle)</type>
+    </constraint>
+    <constraint>
+        <name>dix_details_comanda_producto_fk</name>
+        <type>FOREIGN KEY (idproducto) REFERENCES productos (idproducto) ON DELETE RESTRICT ON UPDATE CASCADE</type>
+    </constraint> 
+    <constraint>
+        <name>dix_details_comanda_comanda_fk</name>
+        <type>FOREIGN KEY (idcomanda) REFERENCES dix_comanda (idcomanda) ON DELETE CASCADE ON UPDATE CASCADE</type>
+    </constraint>
+</table>

@@ -1,0 +1,100 @@
+/* Fondo suave */
+body{ background:#f5f7fb; }
+
+/* Tarjeta contenedora */
+.tpv-card{
+  max-width: 980px;
+  border: 1px solid #e7ebf3;
+  border-radius: 22px;
+  margin-top: 12px;
+  background:
+    radial-gradient(1200px 400px at 50% -10%, rgba(13,110,253,.06), transparent 60%),
+    #fff;
+  box-shadow:
+    0 12px 28px rgba(16,24,40,.08),
+    0 2px 6px rgba(16,24,40,.06);
+  padding: 8px 4px; /* el padding real lo aporta .card-body */
+}
+.tpv-card .card-body{
+  padding: 28px 28px 32px;
+}
+
+/* Título */
+.tpv-title{
+  font-weight: 800;
+  letter-spacing: .2px;
+  color: #0f172a;
+  margin-bottom: 20px;
+}
+
+/* Terminales */
+#terminales-container{ justify-content:center; row-gap:1rem; }
+
+.terminal-card{
+  border:1px solid #e6e9ef;
+  border-radius:16px;
+  background:linear-gradient(180deg,#fff,#fbfdff);
+  box-shadow:0 8px 20px rgba(16,24,40,.06);
+  transition:transform .18s, box-shadow .18s, border-color .18s, background .18s;
+}
+.terminal-card:hover{
+  transform:translateY(-2px);
+  box-shadow:0 16px 34px rgba(16,24,40,.14);
+  border-color:#d7def0;
+}
+.terminal-card i.fa-solid{
+  width:56px; height:56px; display:grid; place-items:center; margin:0 auto .5rem;
+  border-radius:14px; background:#eef3ff; border:1px solid #e2e9ff;
+}
+.terminal-card > div:last-child{ font-weight:600; color:#0f172a; }
+.terminal-card.selected{
+  border-color:#0d6efd;
+  background:linear-gradient(180deg,#f7fbff,#ffffff);
+  box-shadow:0 18px 38px rgba(13,110,253,.22);
+}
+
+/* Acciones */
+.tpv-actions{ display:flex; justify-content:center; gap:.75rem; }
+.tpv-actions .btn{ border-radius:14px; font-weight:700; padding:.65rem 1.1rem; box-shadow:0 6px 14px rgba(16,24,40,.10); }
+.tpv-actions .btn-warning{ color:#212529; border:none; }
+.tpv-actions .btn-success{ border:none; }
+
+/* Dinero inicial: centrado y protagonista */
+#dinero-inicial-container{
+  max-width: 560px;
+  margin: 0 auto 1.25rem;
+}
+#dinero-inicial-container .form-label{
+  display:block; text-align:left; font-weight:700; color:#0f172a; margin-bottom:.4rem;
+}
+#dinero-inicial{
+  height: 50px;
+  border-radius: 14px !important;
+  border: 1px solid #e6e9ef;
+  padding: .8rem 1rem !important;
+  font-size: 1.05rem;
+  background: #ffffff;
+  box-shadow: 0 2px 6px rgba(16,24,40,.05);
+}
+#dinero-inicial:focus{
+  border-color:#0d6efd;
+  outline:0;
+  box-shadow: 0 0 0 .25rem rgba(13,110,253,.15);
+}
+
+/* Keypad */
+.tpv-keypad{ max-width:560px; margin: 12px auto 0; }
+.calculator-button{
+  width:100%; height:64px; border-radius:14px;
+  border:1.6px solid #eea24a;
+  background:#fff; font-weight:800; font-size:1.1rem; letter-spacing:.5px;
+  transition:transform .18s, box-shadow .18s, background .18s, border-color .18s;
+}
+.calculator-button:hover{
+  transform:translateY(-1px);
+  box-shadow:0 10px 26px rgba(16,24,40,.08);
+  background:#fffcf7; border-color:#e59433;
+}
+
+/* Utilidad */
+.cursor-pointer{ cursor:pointer; }

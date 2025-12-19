@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<view>
+    <columns>
+        <group name="data" numcolumns="12">
+            <column name="idlista" order="70" display ="none">
+                <widget type="integer" fieldname="idlista" />
+            </column>
+            <column name="idcaja" order="75" display ="none">
+                <widget type="integer" fieldname="idcaja" />
+            </column>
+            <column name="codpago" order="80">
+                <widget type="text" fieldname="codpago" />
+            </column>
+            <column name="codigofactura" order="85">
+                <widget type="text" fieldname="codigofactura" />
+            </column>            
+            <column name="idfactura" order="90" display ="none">
+                <widget type="integer" fieldname="idfactura" />
+            </column>
+            <column name="total" order="95" >
+                <widget type="double" fieldname="total" />
+            </column>
+            <column name="importeentregado" order="100" >
+                <widget type="double" fieldname="importeentregado" />
+            </column>      
+        </group>
+    </columns>
+</view> 

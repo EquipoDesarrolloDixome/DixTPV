@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<table>
+    <column>
+        <name>codtarifa</name>
+        <type>serial</type>
+        <null>NO</null>
+    </column>
+    <column>
+        <name>nombre</name>
+        <type>character varying (150)</type>
+        <null>NO</null>
+    </column>
+    <column>
+        <name>horaini</name>
+        <type>time</type>
+    </column>
+    <column>
+        <name>horafin</name>
+        <type>time</type>
+    </column>
+    <column>
+        <name>fechainitarifa</name>
+        <type>date</type>
+    </column>
+    <column>
+        <name>fechafintarifa</name>
+        <type>date</type>
+    </column>
+    <column>
+        <name>incremento1</name>
+        <type>double</type>
+    </column>
+    <column>
+        <name>incremento2</name>
+        <type>double</type>
+    </column>
+    <column>
+        <name>descuento1</name>
+        <type>double</type>
+    </column>
+    <column>
+        <name>descuento2</name>
+        <type>double</type>
+    </column>
+    <constraint>
+        <name>dix_tarifas_pkey</name>
+        <type>PRIMARY KEY (codtarifa)</type>
+    </constraint>
+</table>

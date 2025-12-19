@@ -1,0 +1,63 @@
+<div class="modal fade" id="modalRectificarFactura" tabindex="-1" aria-labelledby="rectificarFacturaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-rectificar">
+        <div class="modal-content rectify-modal">
+            <div class="modal-header">
+                <h5 class="modal-title" id="rectificarFacturaLabel">
+                    Rectificar factura
+                    <span class="badge bg-secondary ms-2" id="rectify-invoice-code"></span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-3 text-muted small">
+                    Cliente: <strong id="rectify-client"></strong>
+                </div>
+                <div class="rectify-columns">
+                    <div class="rectify-column">
+                        <div class="rectify-panel">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">Ticket original</h6>
+                                <button class="btn btn-sm btn-outline-primary" type="button" onclick="rectifySelectAll()">
+                                    Seleccionar todo
+                                </button>
+                            </div>
+                            <div id="rectify-available-wrapper" class="rectify-selection">
+                                <div id="rectify-available" class="rectify-list"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="rectify-column">
+                        <div class="rectify-panel">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="mb-0">Productos a devolver</h6>
+                                <span class="badge bg-info" id="rectify-mode-label">Rectificativa</span>
+                            </div>
+                            <div id="rectify-selection-wrapper" class="rectify-selection d-none">
+                                <div id="rectify-selected" class="rectify-list"></div>
+                                <div class="rectify-summary mt-3">
+                                    <div>Total a devolver:</div>
+                                    <strong id="rectify-total">0,00 €</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="rectify-panel rectify-notes mt-3">
+                    <label for="rectifyNotes" class="form-label mb-2">Notas</label>
+                    <textarea id="rectifyNotes" class="form-control" rows="2" placeholder="Motivo de la rectificación (opcional)"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-center flex-wrap gap-2">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-outline-warning" onclick="rectifyClearSelection()">
+                    Limpiar
+                </button>
+                <button type="button" class="btn btn-success" onclick="confirmarRectificativa()">
+                    Crear factura
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

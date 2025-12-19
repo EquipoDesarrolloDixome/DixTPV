@@ -1,0 +1,13 @@
+{# empty Twig template #}
+<div class="row" id="mesasContainer">
+    {% for mesa in fsc.mesas %}
+        {% if mesa.nombre != 'BRA-000' and not mesa.aparcado %}
+            <div class="col-6 col-md-4 col-lg-3 d-flex mesa-item">
+                <div class="mesa-card mesa-disponible" data-iddelsalon="{{ mesa.idsalon }}" 
+                     onclick="seleccionarMesa('{{ mesa.nombre }}');">
+                    <div>{{ mesa.nombre }}</div>
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %}
+</div>

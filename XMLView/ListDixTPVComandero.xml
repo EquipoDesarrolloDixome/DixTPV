@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<view>
+    <columns>
+        <group name="data" numcolumns="12">
+            <column name="idcomandero" order="90" display="none">
+                <widget type="number" fieldname="idcomandero" />
+            </column>
+            <column name="name" order="100">
+                <widget type="text" fieldname="nombre" />
+            </column>
+            <column name="tipo-comandero" order="110">
+                <widget type="select" fieldname="tipocomandero" translate="true" required="true">
+                    <values title="TPV">-1</values>
+                    <values title="Smartphone">0</values>
+                    <values title="Tablet">1</values>
+                </widget>
+            </column>
+            <column name="idterminal" order="120">
+                <widget type="text" fieldname="idterminal" />
+            </column>
+        </group>
+    </columns>
+</view>

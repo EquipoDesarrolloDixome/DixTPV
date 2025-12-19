@@ -1,0 +1,46 @@
+.ocultar{
+    display: none;
+}
+.calculator-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    justify-items: center;
+    width: 100%;
+    margin: 0 auto;
+}
+
+
+.card-camarero{
+    margin: 0.2em;
+    text-align: center;
+    overflow: hidden;
+    overflow-y: hidden;
+    vertical-align: middle;
+    padding-top: 2%;
+    font-size: 0.7em;
+    max-height: 30vh;
+    height:10vh;
+    background-color: #ffffff;
+    border: 2px solid var(--main-bg-color);
+    padding: 10px;
+    border-radius: 10px;
+    transition: all 0.3s ease-in-out;
+
+}
+.card-camarero:hover{
+    background-color: var(--main-bg-color);
+    color: white;
+}
+.camarero-header{
+    background-color: var(--main-bg-color);
+}
+.border-camarero{
+    /*border: 1px solid var(--main-bg-color);*/
+}
+.card-camarero:hover{
+    background-color: var(--main-bg-color);
+}
+.camarero-seleccionado{
+    background-color: var(--main-bg-color);
+}

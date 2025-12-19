@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<view>
+    <columns>
+        <columns>
+            <group name="data" numcolumns="12"> 
+                <column name="iddetalle" order="100">
+                    <widget type="number" fieldname="iddetalle" readonly="true"/>
+                </column>
+                <column name="idcomanda" order="110">
+                    <widget type="select" fieldname="idcomanda" required="true">
+                        <values source="dix_comanda" fieldcode="idcomanda" fieldtitle="idcomanda"/>
+                    </widget>
+                </column>
+                <column name="product" order="130">
+                    <widget type="select" fieldname="idproducto" required="true" onchange="updatePrice(this)">
+                        <values source="productos" fieldcode="idproducto" fieldtitle="descripcion"/> 
+                    </widget>
+                </column>
+                <column name="precio-unitario" order="120">
+                    <widget type="money" fieldname="precio_unitario" readonly="true"/>
+                </column>
+            </group>
+        </columns>
+    </columns>
+</view>

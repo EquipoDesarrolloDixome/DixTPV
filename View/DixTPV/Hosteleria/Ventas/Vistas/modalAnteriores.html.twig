@@ -1,0 +1,510 @@
+<style>
+    #modalanteriores .previous-doc-row {
+        background-color: #ffffff;
+        border-radius: 10px;
+        margin-bottom: 6px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+    }
+
+    #modalanteriores .previous-doc-row.previous-doc-converted {
+        background-color: #eaf7ef;
+    }
+
+    #modalanteriores .previous-doc-row.text-warning {
+        background-color: #fff7df;
+    }
+
+    #modalanteriores .doc-actions .btn,
+    #modalanteriores .doc-actions .badge {
+        min-width: 95px;
+        border-radius: 12px;
+        font-weight: 600;
+    }
+
+    #modalanteriores .tab-content .row.fw-bold {
+        background: #f5f5f5;
+        border-radius: 6px;
+        padding: 12px 0;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        font-size: 13px;
+    }
+</style>
+
+<div class="modal fade" id="modalanteriores" tabindex="-1" aria-labelledby="anterioresModalLabel">
+    <div class="modal-dialog mx-auto classModalAnteriores">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-center w-100" id="anterioresModalLabel">Órdenes Anteriores</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body px-5">
+                {% import _self as anteriores %}
+                <div class="container-fluid">
+                    {% set facturaList = fsc.anterioresFacturas ?? fsc.anteriores ?? [] %}
+                    {% set albaranList = fsc.anterioresAlbaranes ?? [] %}
+                    {% set pedidoList = fsc.anterioresPedidos ?? [] %}
+                    {% if fsc.modoHosteleria %}
+                        {{ anteriores.renderSection({
+                            title: 'Órdenes anteriores',
+                            docs: facturaList,
+                            idField: 'idfactura',
+                            docType: 'FacturaCliente',
+                            allowRectify: true,
+                            emptyMessage: 'No hay órdenes anteriores.'
+                        }) }}
+                    {% else %}
+                        <ul class="nav nav-tabs mb-3" id="anterioresTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="anteriores-facturas-tab"
+                                        data-bs-toggle="tab" data-bs-target="#anteriores-facturas"
+                                        type="button" role="tab" aria-controls="anteriores-facturas" aria-selected="true">
+                                    Facturas
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="anteriores-albaranes-tab"
+                                        data-bs-toggle="tab" data-bs-target="#anteriores-albaranes"
+                                        type="button" role="tab" aria-controls="anteriores-albaranes" aria-selected="false">
+                                    Albaranes
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="anteriores-pedidos-tab"
+                                        data-bs-toggle="tab" data-bs-target="#anteriores-pedidos"
+                                        type="button" role="tab" aria-controls="anteriores-pedidos" aria-selected="false">
+                                    Pedidos
+                                </button>
+                            </li>
+                        </ul>
+                        <div class="tab-content" id="anterioresTabsContent">
+                            <div class="tab-pane fade show active" id="anteriores-facturas" role="tabpanel" aria-labelledby="anteriores-facturas-tab">
+                                {{ anteriores.renderSection({
+                                    title: 'Facturas anteriores',
+                                    docs: facturaList,
+                                    idField: 'idfactura',
+                                    docType: 'FacturaCliente',
+                                    allowRectify: true,
+                                    emptyMessage: 'No hay facturas anteriores.'
+                                }) }}
+                            </div>
+                            <div class="tab-pane fade" id="anteriores-albaranes" role="tabpanel" aria-labelledby="anteriores-albaranes-tab">
+                                {{ anteriores.renderSection({
+                                    title: 'Albaranes anteriores',
+                                    docs: albaranList,
+                                    idField: 'idalbaran',
+                                    docType: 'AlbaranCliente',
+                                    allowRectify: false,
+                                    emptyMessage: 'No hay albaranes anteriores.'
+                                }) }}
+                            </div>
+                            <div class="tab-pane fade" id="anteriores-pedidos" role="tabpanel" aria-labelledby="anteriores-pedidos-tab">
+                                {{ anteriores.renderSection({
+                                    title: 'Pedidos anteriores',
+                                    docs: pedidoList,
+                                    idField: 'idpedido',
+                                    docType: 'PedidoCliente',
+                                    allowRectify: false,
+                                    emptyMessage: 'No hay pedidos anteriores.'
+                                }) }}
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% macro renderSection(section) %}
+    <div class="row justify-content-center mb-4">
+        <div class="col-12">
+            <div class="row fw-bold text-center">
+                <div class="col-1" hidden>ID</div>
+                <div class="col-3">Código</div>
+                <div class="col-3">Fecha</div>
+                <div class="col-3">Hora</div>
+                <div class="col-2">Acción</div>
+            </div>
+        </div>
+        {% set docs = section.docs|default([]) %}
+        {% if docs %}
+            {% for term in docs|reverse|slice(0, 25) %}
+                {% set termId = attribute(term, section.idField) %}
+                {% set isInvoice = section.docType == 'FacturaCliente' %}
+                {% set isAlbaran = section.docType == 'AlbaranCliente' %}
+                {% set isPedido = section.docType == 'PedidoCliente' %}
+                {% set isUnpaid = isInvoice and not (term.pagada ?? true) %}
+                {% set isConverted = isAlbaran and (term.facturado ?? false) %}
+                {% set pedidoFacturado = isPedido and (term.facturaDesdePedido.id is defined and term.facturaDesdePedido.id) %}
+                {% set rowClasses = ['row', 'align-items-center', 'text-center', 'py-2', 'previous-doc-row'] %}
+                {% if isUnpaid %}
+                    {% set rowClasses = rowClasses|merge(['text-danger', 'fw-bold', 'previous-doc-unpaid']) %}
+                {% endif %}
+                {% if isConverted or pedidoFacturado %}
+                    {% set rowClasses = rowClasses|merge(['text-success', 'fw-bold', 'previous-doc-converted']) %}
+                {% endif %}
+                {% set albaranId = term.albaranDesdePedido.id|default('') %}
+                {% set facturaId = term.facturaDesdePedido.id|default('') %}
+                <div class="col-12">
+                    <div class="{{ rowClasses|join(' ') }}"
+                         data-doc-type="{{ section.docType }}"
+                         data-doc-id="{{ termId }}"
+                         data-doc-code="{{ term.codigo }}"
+                         data-pagada="{{ isInvoice and not isUnpaid ? '1' : '0' }}"
+                         data-facturado="{{ (isConverted or pedidoFacturado) ? '1' : '0' }}"
+                         data-albaran-id="{{ isPedido and term.albaranDesdePedido.id is defined ? term.albaranDesdePedido.id : '' }}"
+                         data-albaran-code="{{ isPedido and term.albaranDesdePedido.codigo is defined ? term.albaranDesdePedido.codigo : '' }}"
+                         data-factura-id="{{ (isPedido and term.facturaDesdePedido.id is defined) ? term.facturaDesdePedido.id : '' }}"
+                         data-factura-code="{{ (isPedido and term.facturaDesdePedido.codigo is defined) ? term.facturaDesdePedido.codigo : '' }}">
+                        <div class="col-1" hidden>{{ termId }}</div>
+                        <div class="col-3 previous-doc-code">
+                            {{ term.codigo }}
+                            {% if isConverted and term.facturaCodigo %}
+                                <small class="d-block text-success fw-semibold linked-invoice-label">Factura {{ term.facturaCodigo }}</small>
+                            {% endif %}
+                            {% if isPedido %}
+                                {% if term.albaranDesdePedido.codigo is defined and term.albaranDesdePedido.codigo %}
+                                    <small class="d-block text-info fw-semibold pedido-albaran-label">Albarán {{ term.albaranDesdePedido.codigo }}</small>
+                                {% endif %}
+                                {% if term.facturaDesdePedido.codigo is defined and term.facturaDesdePedido.codigo %}
+                                    <small class="d-block text-success fw-semibold pedido-factura-label">Factura {{ term.facturaDesdePedido.codigo }}</small>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                        <div class="col-3">{{ term.fecha }}</div>
+                        <div class="col-3">{{ term.hora|slice(0,5) }}</div>
+                        <div class="col-2 d-flex justify-content-center gap-2 doc-actions">
+                            {% if section.allowRectify %}
+                                <button class="btn btn-sm btn-outline-warning" onclick="abrirRectificativa({{ termId }});">
+                                    <i class="fas fa-pen"></i>
+                                </button>
+                            {% endif %}
+                            <button class="btn btn-sm btn-outline-primary" onclick="ImprimirViejo({{ termId }}, '{{ section.docType }}');">
+                                <i class="fas fa-print"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-primary" onclick="RecuperarCuenta({{ termId }});" hidden>
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                            {% if isInvoice and isUnpaid %}
+                                <button class="btn btn-sm btn-outline-success btn-pay-invoice" onclick="pagarFacturaAnterior({{ termId }});" title="Cobrar factura">
+                                    <i class="fas fa-coins"></i>
+                                </button>
+                            {% endif %}
+                            {% if isAlbaran %}
+                                {% if isConverted %}
+                                    <span class="badge bg-success text-white previous-doc-badge">Facturado</span>
+                                {% else %}
+                                    <button class="btn btn-sm btn-outline-success btn-convert-albaran" onclick="facturarAlbaranAnterior({{ termId }});" title="Facturar albarán">
+                                        <i class="fas fa-file-invoice"></i>
+                                    </button>
+                                {% endif %}
+                            {% endif %}
+                            {% if isPedido %}
+                                {% if not albaranId and not facturaId %}
+                                    <button class="btn btn-sm btn-outline-secondary btn-pedido-albaran" onclick="pedidoAnteriorAAlbaran({{ termId }});" title="Generar albarán">
+                                        <i class="fas fa-file-lines"></i>
+                                    </button>
+                                {% else %}
+                                    <span class="badge bg-info text-dark pedido-albaran-badge">Albarán listo</span>
+                                {% endif %}
+                                {% if not facturaId and not albaranId %}
+                                    <button class="btn btn-sm btn-outline-success btn-pedido-factura" onclick="pedidoAnteriorAFactura({{ termId }});" title="Generar factura">
+                                        <i class="fas fa-file-invoice"></i>
+                                    </button>
+                                {% else %}
+                                    <span class="badge bg-success text-white pedido-factura-badge">Facturado</span>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12 text-center">
+                <p>{{ section.emptyMessage }}</p>
+            </div>
+        {% endif %}
+    </div>
+{% endmacro %}
+
+<script>
+(function () {
+    if (typeof window.pedidoAnteriorAAlbaran === 'function' && typeof window.pedidoAnteriorAFactura === 'function') {
+        return;
+    }
+
+    function convertirPedidoAnterior(idPedido, action, successLabel) {
+        if (!idPedido) {
+            return;
+        }
+
+        $.ajax({
+            method: 'POST',
+            url: window.location.href,
+            data: {
+                action: action,
+                idpedido: idPedido
+            },
+            success: function (response) {
+                const payload = parseDixAjaxJson(response);
+                if (!payload || typeof payload.success === 'undefined') {
+                    setToast('Respuesta inesperada al convertir el pedido.', 'danger', 'Conversión de pedido', 4000);
+                    return;
+                }
+
+                if (payload.success) {
+                    const data = payload.pedido || {};
+                    actualizarEstadoPedidoAnterior(idPedido, data);
+                    if (data.albaran) {
+                        agregarAlbaranAnteriorDesdeDatos(data.albaran);
+                    }
+                    if (data.factura) {
+                        agregarFacturaAnteriorDesdeDatos({
+                            id: data.factura.id,
+                            codigo: data.factura.codigo,
+                            fecha: data.factura.fecha,
+                            hora: data.factura.hora,
+                            pagada: true
+                        });
+                    }
+                    setToast(payload.message || successLabel, 'success', 'Conversión de pedido', 4000);
+                } else {
+                    setToast(payload.message || 'No se pudo completar la conversión del pedido.', 'danger', 'Conversión de pedido', 4000);
+                }
+            },
+            error: function () {
+                setToast('No se pudo comunicar con el servidor para convertir el pedido.', 'danger', 'Conversión de pedido', 4000);
+            }
+        });
+    }
+
+    function actualizarEstadoPedidoAnterior(idPedido, data) {
+        const row = document.querySelector(`.previous-doc-row[data-doc-type="PedidoCliente"][data-doc-id="${idPedido}"]`);
+        if (!row) {
+            return;
+        }
+
+        const codeContainer = row.querySelector('.previous-doc-code');
+        const actions = row.querySelector('.doc-actions');
+
+        if (data.albaran && data.albaran.codigo) {
+            row.dataset.albaranId = data.albaran.id || '';
+            row.dataset.albaranCode = data.albaran.codigo || '';
+            row.classList.remove('text-success', 'previous-doc-converted');
+            row.classList.add('text-warning', 'fw-bold');
+            if (codeContainer) {
+                setPedidoLabel(codeContainer, 'pedido-albaran-label', `Albarán ${data.albaran.codigo}`, 'text-warning');
+            }
+            if (actions) {
+                togglePedidoActionButton(actions, '.btn-pedido-albaran', 'badge bg-warning text-dark pedido-albaran-badge', 'Albarán listo');
+                const facturaBtn = actions.querySelector('.btn-pedido-factura');
+                if (facturaBtn) {
+                    facturaBtn.remove();
+                }
+            }
+        }
+
+        if (data.factura && data.factura.codigo) {
+            row.dataset.facturaId = data.factura.id || '';
+            row.dataset.facturaCode = data.factura.codigo || '';
+            row.dataset.facturado = '1';
+            row.classList.remove('text-warning');
+            row.classList.add('text-success', 'fw-bold', 'previous-doc-converted');
+            if (codeContainer) {
+                setPedidoLabel(codeContainer, 'pedido-factura-label', `Factura ${data.factura.codigo}`, 'text-success');
+            }
+            if (actions) {
+                togglePedidoActionButton(actions, '.btn-pedido-factura', 'badge bg-success text-white pedido-factura-badge', 'Facturado');
+                const albaranBtn = actions.querySelector('.btn-pedido-albaran');
+                if (albaranBtn) {
+                    albaranBtn.remove();
+                }
+            }
+        }
+
+        aplicarEstadoBotonesPedidos(row);
+    }
+
+    function setPedidoLabel(container, className, text, colorClass) {
+        let label = container.querySelector(`.${className}`);
+        if (!label) {
+            label = document.createElement('small');
+            label.className = `${className} d-block fw-semibold ${colorClass}`;
+            container.appendChild(label);
+        }
+        label.textContent = text;
+    }
+
+    function togglePedidoActionButton(actionsContainer, buttonSelector, badgeClasses, badgeText) {
+        const button = actionsContainer.querySelector(buttonSelector);
+        if (button) {
+            button.remove();
+        }
+
+        const className = badgeClasses.split(' ').find(cls => cls.startsWith('pedido-'));
+        if (className) {
+            const existing = actionsContainer.querySelector(`.${className}`);
+            if (existing) {
+                existing.textContent = badgeText;
+                return;
+            }
+        }
+
+        const badge = document.createElement('span');
+        badge.className = badgeClasses;
+        badge.textContent = badgeText;
+        actionsContainer.appendChild(badge);
+    }
+
+    function aplicarEstadoBotonesPedidos(row) {
+        if (!row) {
+            return;
+        }
+
+        const codeContainer = row.querySelector('.previous-doc-code');
+        const actions = row.querySelector('.doc-actions');
+        const hasAlbaran = Boolean(row.dataset.albaranId || row.dataset.albaranCode);
+        const hasFactura = Boolean(row.dataset.facturaId || row.dataset.facturaCode || row.dataset.facturado === '1');
+
+        if (hasAlbaran) {
+            row.classList.remove('text-success', 'previous-doc-converted');
+            row.classList.add('text-warning', 'fw-bold');
+            if (codeContainer) {
+                const albaranCode = row.dataset.albaranCode || row.dataset.albaranId || '';
+                setPedidoLabel(codeContainer, 'pedido-albaran-label', `Albarán ${albaranCode}`, 'text-warning');
+            }
+            if (actions) {
+                togglePedidoActionButton(actions, '.btn-pedido-albaran', 'badge bg-warning text-dark pedido-albaran-badge', 'Albarán listo');
+                const facturaBtn = actions.querySelector('.btn-pedido-factura');
+                if (facturaBtn) {
+                    facturaBtn.remove();
+                }
+            }
+        }
+
+        if (hasFactura) {
+            row.classList.remove('text-warning');
+            row.classList.add('text-success', 'fw-bold', 'previous-doc-converted');
+            if (codeContainer) {
+                const facturaCode = row.dataset.facturaCode || row.dataset.facturaId || '';
+                setPedidoLabel(codeContainer, 'pedido-factura-label', `Factura ${facturaCode}`, 'text-success');
+            }
+            if (actions) {
+                togglePedidoActionButton(actions, '.btn-pedido-factura', 'badge bg-success text-white pedido-factura-badge', 'Facturado');
+                const albaranBtn = actions.querySelector('.btn-pedido-albaran');
+                if (albaranBtn) {
+                    albaranBtn.remove();
+                }
+            }
+        }
+    }
+
+    function aplicarEstadoInicialPedidos() {
+        if (typeof document === 'undefined') {
+            return;
+        }
+
+        const pedidoRows = document.querySelectorAll('.previous-doc-row[data-doc-type="PedidoCliente"]');
+        pedidoRows.forEach(aplicarEstadoBotonesPedidos);
+    }
+
+    if (typeof document !== 'undefined') {
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', aplicarEstadoInicialPedidos);
+        } else {
+            aplicarEstadoInicialPedidos();
+        }
+    }
+
+    function agregarAlbaranAnteriorDesdeDatos(datos) {
+        if (!datos || !datos.id) {
+            return;
+        }
+
+        const existingRow = document.querySelector(`.previous-doc-row[data-doc-type="AlbaranCliente"][data-doc-id="${datos.id}"]`);
+        if (existingRow) {
+            return;
+        }
+
+        const container = document.querySelector('#anteriores-albaranes .row.justify-content-center');
+        if (!container) {
+            return;
+        }
+
+        const emptyMessage = container.querySelector('.col-12.text-center');
+        if (emptyMessage) {
+            emptyMessage.remove();
+        }
+
+        const col = document.createElement('div');
+        col.className = 'col-12';
+
+        const row = document.createElement('div');
+        row.className = 'row align-items-center text-center py-2 previous-doc-row';
+        row.dataset.docType = 'AlbaranCliente';
+        row.dataset.docId = datos.id;
+        row.dataset.docCode = datos.codigo || '';
+
+        const idCol = document.createElement('div');
+        idCol.className = 'col-1';
+        idCol.hidden = true;
+        idCol.textContent = datos.id;
+
+        const codeCol = document.createElement('div');
+        codeCol.className = 'col-3 previous-doc-code';
+        codeCol.textContent = datos.codigo || '';
+
+        const fechaCol = document.createElement('div');
+        fechaCol.className = 'col-3';
+        fechaCol.textContent = datos.fecha || '';
+
+        const horaCol = document.createElement('div');
+        horaCol.className = 'col-3';
+        horaCol.textContent = (datos.hora || '').substring(0, 5);
+
+        const actionsCol = document.createElement('div');
+        actionsCol.className = 'col-2 d-flex justify-content-center gap-2 doc-actions';
+
+        const printBtn = document.createElement('button');
+        printBtn.className = 'btn btn-sm btn-outline-primary';
+        printBtn.innerHTML = '<i class="fas fa-print"></i>';
+        printBtn.addEventListener('click', () => ImprimirViejo(datos.id, 'AlbaranCliente'));
+
+        const facturaBtn = document.createElement('button');
+        facturaBtn.className = 'btn btn-sm btn-outline-success btn-convert-albaran';
+        facturaBtn.innerHTML = '<i class="fas fa-file-invoice"></i>';
+        facturaBtn.title = 'Facturar albarán';
+        facturaBtn.addEventListener('click', () => facturarAlbaranAnterior(datos.id));
+
+        actionsCol.appendChild(printBtn);
+        actionsCol.appendChild(facturaBtn);
+
+        row.appendChild(idCol);
+        row.appendChild(codeCol);
+        row.appendChild(fechaCol);
+        row.appendChild(horaCol);
+        row.appendChild(actionsCol);
+
+        col.appendChild(row);
+
+        const header = container.querySelector('.col-12');
+        if (header && header.nextSibling) {
+            container.insertBefore(col, header.nextSibling);
+        } else {
+            container.appendChild(col);
+        }
+    }
+
+    window.pedidoAnteriorAAlbaran = function (id) {
+        convertirPedidoAnterior(id, 'pedidoToAlbaran', 'Pedido convertido a albarán.');
+    };
+    window.pedidoAnteriorAFactura = function (id) {
+        convertirPedidoAnterior(id, 'pedidoToFactura', 'Pedido convertido a factura.');
+    };
+})();
+</script>

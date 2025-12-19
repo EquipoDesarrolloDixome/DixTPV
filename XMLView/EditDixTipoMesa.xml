@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<view>
+    <columns>
+        <group name="data" numcolumns="12">
+            <column name="idmesa" order="100" display="none">
+                <widget type="number" fieldname="idmesa" readonly="true"/>
+            </column>
+            <column name="tipo-mesa" order="110" numcolumns="4">
+                <widget type="text" fieldname="nombre"/>
+            </column>
+        </group>            
+    </columns>
+</view>

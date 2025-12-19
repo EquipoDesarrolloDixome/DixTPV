@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<table>
+    <column>
+        <name>idcomanda</name>
+        <type>serial</type>
+        <null>NO</null>
+    </column>
+    <column>
+        <name>fecha</name>
+        <type>timestamp</type>
+    </column>
+    <column>
+        <name>idcliente</name>
+        <type>character varying(10)</type>
+    </column>
+    <column>
+        <name>idsalon</name>
+        <type>integer</type> <!-- Cambiado a integer -->
+    </column>
+    <column>
+        <name>idmesa</name>
+        <type>integer</type>
+    </column>
+    <column>
+        <name>idestado</name>
+        <type>integer</type>
+    </column>
+    <column>
+        <name>nombrecliente</name>
+        <type>character varying(100)</type>
+    </column>
+    <column>
+        <name>nombremesa</name>
+        <type>character varying(100)</type>
+        <null>YES</null> <!-- Eliminado el valor por defecto -->
+    </column>
+    <column>
+        <name>nombresalon</name>
+        <type>character varying(100)</type>
+        <null>YES</null> <!-- Eliminado el valor por defecto -->
+    </column>
+    <column>
+        <name>total</name>
+        <type>double precision</type>
+        <null>NO</null>
+        <default>0</default>
+    </column>
+    <column>
+        <name>observaciones</name>
+        <type>text</type>
+        <null>YES</null>
+    </column>
+    <constraint>
+        <name>dix_comanda_pkey</name>
+        <type>PRIMARY KEY (idcomanda)</type>
+    </constraint>
+    <!--Añadi claves foraneas pendientes de revision
+    <constraint>
+        <name>dix_comanda_idcliente</name>
+        <type>FOREIGN KEY (idcliente) REFERENCES clientes (codcliente) ON UPDATE CASCADE ON DELETE RESTRICT </type>
+    </constraint>-->
+    <constraint>
+        <name>dix_comanda_idsalon</name>
+        <type>FOREIGN KEY (idsalon) REFERENCES dix_salones (idsalon) ON UPDATE CASCADE ON DELETE RESTRICT </type>
+    </constraint>
+    <constraint>
+        <name>dix_comanda_idmesa</name>
+        <type>FOREIGN KEY (idmesa) REFERENCES dix_mesa (idmesa) ON UPDATE CASCADE ON DELETE RESTRICT </type>
+    </constraint>
+    <constraint>
+        <name>dix_comanda_idestado</name>
+        <type>FOREIGN KEY (idestado) REFERENCES dix_estado (idestado) ON UPDATE CASCADE ON DELETE RESTRICT </type>
+    </constraint>
+</table>

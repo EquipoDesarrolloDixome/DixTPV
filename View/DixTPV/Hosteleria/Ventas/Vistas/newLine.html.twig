@@ -1,0 +1,85 @@
+<div class="modal fade" id="newLine" tabindex="-1" aria-labelledby="newLineModalLabel">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="newLineModalLabel">Añadir línea</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-6 mb-3">
+              <label class="mb-0">Producto:</label>
+              <div class="input-group">
+                <input type="text" id="newName" name="newName" value="Varios" class="form-control" maxlength="40" autocomplete="off">
+              </div>
+            </div>
+
+            <div class="col-3 mb-3">
+              <label class="mb-0">Precio:</label>
+              <div class="input-group">
+                <input
+                  id="newPvp" name="newPvp"
+                  type="text" inputmode="decimal" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                  class="form-control text-end"
+                  value="1.00"
+                  data-kind="plain-decimal"
+                  onclick="seleccionarInput(this);"
+                >
+              </div>
+            </div>
+
+            <div class="col-3 mb-3" hidden>
+              <label class="mb-0">IVA %:</label>
+              <div class="input-group">
+                <input
+                  id="newIva" name="newIva"
+                  type="text" inputmode="numeric" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                  class="form-control text-end"
+                  value="21"
+                  data-kind="iva"
+                  onclick="seleccionarInput(this);"
+                >
+              </div>
+            </div>
+
+            <!-- Calculadora numérica para estos inputs -->
+            <div class="col-12">
+              <div class="d-grid gap-2" id="newline-keypad">
+                <div class="row g-0 mb-2">
+                  <div class="col-4 p-1"><button class="btn btn-light w-100" onclick="agregarNumeroNL('7')">7</button></div>
+                  <div class="col-4 p-1"><button class="btn btn-light w-100" onclick="agregarNumeroNL('8')">8</button></div>
+                  <div class="col-4 p-1"><button class="btn btn-light w-100" onclick="agregarNumeroNL('9')">9</button></div>
+                </div>
+                <div class="row g-0 mb-2">
+                  <div class="col-4 p-1"><button class="btn btn-light w-100" onclick="agregarNumeroNL('4')">4</button></div>
+                  <div class="col-4 p-1"><button class="btn btn-light w-100" onclick="agregarNumeroNL('5')">5</button></div>
+                  <div class="col-4 p-1"><button class="btn btn-light w-100" onclick="agregarNumeroNL('6')">6</button></div>
+                </div>
+                <div class="row g-0 mb-2">
+                  <div class="col-4 p-1"><button class="btn btn-light w-100" onclick="agregarNumeroNL('1')">1</button></div>
+                  <div class="col-4 p-1"><button class="btn btn-light w-100" onclick="agregarNumeroNL('2')">2</button></div>
+                  <div class="col-4 p-1"><button class="btn btn-light w-100" onclick="agregarNumeroNL('3')">3</button></div>
+                </div>
+                <div class="row g-0">
+                  <div class="col-4 p-1"><button class="btn btn-light w-100" onclick="agregarNumeroNL('0')">0</button></div>
+                  <div class="col-4 p-1"><button class="btn btn-light w-100" onclick="agregarNumeroNL('.')">,</button></div>
+                  <div class="col-4 p-1"><button class="btn btn-warning w-100" onclick="borrarNumeroNL()">⌫</button></div>
+                </div>
+              </div>
+            </div>
+
+          </div> <!-- row -->
+        </div> <!-- container -->
+      </div> <!-- modal-body -->
+
+      <div class="modal-footer">
+        <button class="btn btn-success" onclick="addProducto();">Guardar</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+
+    </div>
+  </div>
+</div>

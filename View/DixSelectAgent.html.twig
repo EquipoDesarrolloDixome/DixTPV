@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8"> 
+        <title>Prueba Twig</title>
+    </head>
+    <body>
+        <h1>Prueba de datos {{ fsc.user.nick }}</h1>
+        <p>Datos recibidos: {{ camareros | length }}</p>
+
+        {% for camarero in camareros %}
+            <span> {{ camarero.nombre }} </span>
+        {%endfor%}
+
+    </body>
+</html>

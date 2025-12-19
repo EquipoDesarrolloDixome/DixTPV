@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<view>
+    <columns>
+        <group name="data" numcolumns="12">
+            <column name="idreserva" order="100" display="none">
+                <widget type="number" fieldname="idreserva"/>
+            </column>
+            <column name="name-reserva" order="100" numcolumns="3">
+                <widget type="text" fieldname="nombrereserva"/>
+            </column>
+            <column name="mesa" order="100" numcolumns="3">
+                <widget type="select" fieldname="idmesa">
+                    <values source="dix_mesa" fieldcode="idmesa" fieldtitle="nombre" filter="idsalon"/>
+                </widget>
+            </column>
+            <column name="comansales" order="115" required="true" numcolumns="3">
+                <widget type="integer" fieldname="personas"/>
+            </column>
+            <column name="date" order="120" numcolumns="3">
+                <widget type="date" fieldname="fecha"/>
+            </column>            
+            <column name="hora-inicio" order="130" numcolumns="4">
+                <widget type="time" fieldname="horaini"/>
+            </column>      
+            <column name="fin" order="140" numcolumns="4">
+                <widget type="time" fieldname="horafin"/>
+            </column>
+            <column name="num-tarjeta" order="145" numcolumns="4" >
+                <widget min="1000000000000" max="999999999999999999" 
+                        type="number" fieldname="numtarjeta" required="true"/>
+            </column>
+            <column name="comentarios" order="150" numcolumns="12">
+                <widget type="textarea" fieldname="comentarios"/>
+            </column>
+        </group>
+    </columns>
+</view>

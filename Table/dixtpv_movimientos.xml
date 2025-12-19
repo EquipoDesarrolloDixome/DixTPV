@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<table>
+    <column>
+        <name>amount</name>
+        <type>double precision</type>
+        <null>NO</null>
+        <default>0</default>
+    </column>
+    <column>
+        <name>creationdate</name>
+        <type>timestamp</type>
+        <null>NO</null>
+    </column>
+    <column>
+        <name>id</name>
+        <type>serial</type>
+        <null>NO</null>
+    </column>
+    <column>
+        <name>idasiento</name>
+        <type>integer</type>
+    </column>
+    <column>
+        <name>idcaja</name>
+        <type>integer</type>
+    </column>
+    <column>
+        <name>idtpv</name>
+        <type>integer</type>
+    </column>
+    <column>
+        <name>lastnick</name>
+        <type>character varying(50)</type>
+    </column>
+    <column>
+        <name>lastupdate</name>
+        <type>timestamp</type>
+    </column>
+    <column>
+        <name>motive</name>
+        <type>character varying(250)</type>
+        <null>NO</null>
+    </column>
+    <column>
+        <name>nick</name>
+        <type>character varying(50)</type>
+    </column>
+    <constraint>
+        <name>dixtpv_movimientos_pkey</name>
+        <type>PRIMARY KEY (id)</type>
+    </constraint>
+    <constraint>
+        <name>dixtpv_idasiento</name>
+        <type>FOREIGN KEY (idasiento) REFERENCES asientos (idasiento) ON UPDATE CASCADE ON DELETE RESTRICT </type>
+    </constraint>
+    <constraint>
+        <name>dixtpv_idcaja</name>
+        <type>FOREIGN KEY (idcaja) REFERENCES dixtpv_cajas (idcaja) ON UPDATE CASCADE ON DELETE RESTRICT </type>
+    </constraint>
+    <constraint>
+        <name>dixtpv_idtpv</name>
+        <type>FOREIGN KEY (idtpv) REFERENCES dixtpv (idtpv) ON UPDATE CASCADE ON DELETE RESTRICT </type>
+    </constraint>
+</table>

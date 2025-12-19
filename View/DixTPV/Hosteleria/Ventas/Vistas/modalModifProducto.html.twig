@@ -1,0 +1,23 @@
+<!-- modalModifProducto.html.twig -->
+<div class="modal fade" id="modalmodifprod" tabindex="-1" aria-labelledby="modifprodModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg"> 
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modifprodModalLabel">Editar Producto</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12">
+                            {% include 'DixTPV/Hosteleria/Ventas/Componentes/modalmodifprod.html.twig' %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="cerrarModalmodif();">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>

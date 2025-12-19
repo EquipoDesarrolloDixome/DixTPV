@@ -1,0 +1,47 @@
+{# Normalizamos colores y garantizamos que lleven # y estén en mayúsculas #}
+{% set bg0 = family.color_fondo|default('#F2F2F2') %}
+{% set fg0 = family.color_texto|default('#333333') %}
+
+{% set bg = (bg0 starts with('#') ? bg0 : '#' ~ bg0)|upper %}
+{% set fg = (fg0 starts with('#') ? fg0 : '#' ~ fg0)|upper %}
+
+{# Expandimos formatos cortos tipo #FFF a #FFFFFF #}
+{% if bg|length == 4 %}{% set bg = '#' ~ bg[1] ~ bg[1] ~ bg[2] ~ bg[2] ~ bg[3] ~ bg[3] %}{% endif %}
+{% if fg|length == 4 %}{% set fg = '#' ~ fg[1] ~ fg[1] ~ fg[2] ~ fg[2] ~ fg[3] ~ fg[3] %}{% endif %}
+
+{# Regla: si los DOS son blanco, forzamos texto negro #}
+{% if bg == '#FFFFFF' and fg == '#FFFFFF' %}
+  {% set fg = '#000000' %}
+{% endif %}
+
+{% set esHija = family.madre is not empty %}
+{% set imageUrl = family.imagen_url|default('') %}
+{% set showDesc = showDescription is defined ? showDescription : (fsc.mostrarDescripcionCartas ?? false) %}
+{% set hasImage = imageUrl != '' %}
+{% set showDescOnly = showDesc %}
+
+<div class="fam-card col-6 col-sm-4 col-lg-3 col-xl-2 {{ esHija ? 'is-child' : 'is-parent' }} {{ showDescOnly ? 'fam-card--desc-only' : '' }}"
+     data-code="{{ family.codfamilia }}"
+     data-name="{{ family.descripcion|e('html_attr') }}"
+     data-parent="{{ family.madre|default('') }}"
+     style="--fam-bg: {{ bg|e('html_attr') }}; --fam-fg: {{ fg|e('html_attr') }}; --card-bg: {{ bg|e('html_attr') }}; --card-fg: {{ fg|e('html_attr') }};{% if esHija %}display:none;{% endif %}"
+     onclick="handleFamilyClick('{{ family.codfamilia }}')">
+  {% if showDescOnly %}
+    <div class="fam-card-desc-only">
+        {{ family.descripcion }}
+    </div>
+  {% elseif hasImage %}
+    <div class="fam-card-img">
+        <img src="{{ imageUrl }}" alt="{{ family.descripcion|e }}">
+    </div>
+  {% else %}
+    <div class="fam-card-img no-image">
+        {{ family.descripcion|slice(0,2)|upper }}
+    </div>
+  {% endif %}
+  {% if not showDescOnly %}
+    <div class="fam-card-text">
+      {{ family.descripcion|length > 15 ? family.descripcion|slice(0,15) ~ '...' : family.descripcion }}
+    </div>
+  {% endif %}
+</div>

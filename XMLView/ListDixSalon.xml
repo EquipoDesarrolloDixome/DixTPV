@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<view>
+    <columns>
+        <group name="data" numcolumns="12">
+            <column name="idsalon" order="100" display="none">
+                <widget type="number" fieldname="idsalon" readonly="true"/> 
+            </column>
+            <column name="cod-salon" order="105" requiere="true">
+                <widget type="text" fieldname="codsalon"/>
+            </column>
+            <column name="name" order="110">
+                <widget type="text" fieldname="nombre"/>
+            </column>
+            <column name="observaciones" order="160">
+                <widget type="textarea" fieldname="observaciones"/>
+            </column>
+        </group>
+    </columns>
+</view>

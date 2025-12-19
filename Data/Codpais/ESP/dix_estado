@@ -1,0 +1,5 @@
+"nombre";"descripcion"
+"Pendiente";"La comanda esta pendiente"
+"Completado";"La comanda esta completada"
+"Cancelado";"La comanda esta cancelada"
+"En proceso";"La comanda esta en proceso"

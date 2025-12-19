@@ -1,0 +1,73 @@
+<!-- Modal Nuevo Cliente -->
+<div class="modal fade" id="modalNuevoCliente" tabindex="-1" aria-labelledby="modalNuevoClienteLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content border border-primary shadow-sm">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="modalNuevoClienteLabel">➕ Nuevo Cliente</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+
+            <div class="modal-body">
+                <form id="nuevoCliente" onsubmit="event.preventDefault();
+                        anhadirNuevoCliente();">
+                    <div class="row g-3">
+                        <div class="col-12 mb-3">
+                            <label for="razonSocial" class="form-label">Razón Social</label>
+                            <input type="text" class="form-control" id="razonSocial" name="razonSocial" required>
+                            <input type="hidden" id="nombre" name="nombre">
+                        </div>
+
+                        <div class="col-12 col-md-6 mb-3">
+                            <label for="tipoIdFiscal" class="form-label">Tipo Id Fiscal</label>
+                            <select class="form-select" id="tipoIdFiscal" name="tipoIdFiscal" required>
+                                <option value="">Seleccione...</option>
+                                {% for tipoIdFiscal in fsc.tipoIdFiscales %}
+                                    <option value="{{ tipoIdFiscal.tipoidfiscal }}">{{ tipoIdFiscal.tipoidfiscal }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-12 col-md-6 mb-3">
+                            <label for="numeroIdFiscal" class="form-label">Nº Id Fiscal</label>
+                            <input type="text" class="form-control" id="numeroIdFiscal" name="numeroIdFiscal" required>
+                        </div>
+
+                        <div class="col-12 mb-3">
+                            <label for="direccion" class="form-label">Dirección</label>
+                            <input type="text" class="form-control" id="direccion" name="direccion" required>
+                        </div>
+
+                        <div class="col-12 col-md-4 mb-3">
+                            <label for="codigoPostal" class="form-label">Código Postal</label>
+                            <input type="text" class="form-control" id="codigoPostal" name="codigoPostal" required>
+                        </div>
+
+                        <div class="col-12 col-md-4 mb-3">
+                            <label for="ciudad" class="form-label">Ciudad</label>
+                            <input type="text" class="form-control" id="ciudad" name="ciudad" required>
+                        </div>
+
+                        <div class="col-12 col-md-4 mb-3">
+                            <label for="provincia" class="form-label">Provincia</label>
+                            <input type="text" class="form-control" id="provincia" name="provincia" required>
+                        </div>
+
+                        <div class="col-12 mb-3">
+                            <label for="codpais" class="form-label">País</label>
+                            <select class="form-select" id="codpais" name="codpais" required>
+                                {% for pais in fsc.paises %}
+                                    <option value="{{ pais.codpais }}"{% if pais.codpais == 'ESP' %} selected{% endif %}>{{ pais.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-primary" form="nuevoCliente">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,26 @@
+{#{% extends 'Master/MenuTemplate.html.twig' %}#}
+{% block css %}
+    <link rel="stylesheet" href="{{ asset('node_modules/bootstrap/dist/css/bootstrap.min.css') }}"/>
+    <link rel="stylesheet" href="{{ asset('node_modules/@fortawesome/fontawesome-free/css/all.min.css') }}"/>
+    <link rel="stylesheet" href="{{ asset('Dinamic/Assets/CSS/custom.css') }}?v=6"/>
+{% endblock %}
+{% block javascripts %}
+    <script src="{{ asset('node_modules/jquery/dist/jquery.min.js') }}"></script>
+    <script src="{{ asset('Dinamic/Assets/JS/DixTPV.js') }}"></script>
+    <script src="{{ asset('node_modules/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('Plugins/DixTPV/Assets/JS/vendor/bootbox.min.js') }}"></script>
+    <script src="{{ asset('Plugins/DixTPV/Assets/JS/vendor/bootbox.locales.min.js') }}"></script>
+    <script src="{{ asset('node_modules/pace-js/pace.min.js') }}"></script>
+    <script src="{{ asset('node_modules/@fortawesome/fontawesome-free/js/all.min.js') }}"></script>
+    <script src="{{ asset('Dinamic/Assets/JS/Custom.js') }}?v=6"></script>
+{% endblock %}
+
+<style>
+    body{
+        margin: 25px;
+    }
+</style>
+
+<div class="row" style="max-height: 250px; margin-bottom: 10px;">
+    {% include fsc.theme ~ 'Componentes/terminales.html.twig' %}
+</div>

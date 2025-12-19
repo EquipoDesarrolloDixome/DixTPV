@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<view>
+    <columns>
+        <group name="data" numcolumns="12">
+            <column name="iddixformaspago" order="70" display ="none">
+                <widget type="integer" fieldname="iddixformaspago" />
+            </column>
+            <column name="idcaja" order="75" display ="none">
+                <widget type="integer" fieldname="idcaja" />
+            </column>
+            <column name="codpago" order="80">
+                <widget type="text" fieldname="codpago" />
+            </column>
+            <column name="total" order="95" >
+                <widget type="money" fieldname="total" />
+            </column>  
+        </group>
+    </columns>
+</view> 

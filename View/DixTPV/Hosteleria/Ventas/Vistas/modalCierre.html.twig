@@ -1,0 +1,73 @@
+<div id="modalCerrarCaja" class="modal fade" tabindex="-1">
+    <div class="modal-dialog ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cerrar Caja</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-6">
+                        <div class="mb-3">
+                            <label for="dineroFinal" class="form-label">Dinero final en caja:</label>
+                            <input type="text" id="dineroFinal" class="form-control" placeholder="Importe cierre" onclick="seleccionarInputTer(this);"/>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="center padNumericModalCierre">
+                            <div class="row">
+                                <div class="col-4 text-center" onclick="agregarNumeroTer(1);">
+                                    <button class="btn btn-light w-100 calculator-button" >1</button>
+                                </div>
+                                <div class="col-4 text-center" onclick="agregarNumeroTer(2);">
+                                    <button class="btn btn-light w-100 calculator-button">2</button>
+                                </div>
+                                <div class="col-4 text-center" onclick="agregarNumeroTer(3);">
+                                    <button class="btn btn-light w-100 calculator-button">3</button>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4 text-center" onclick="agregarNumeroTer(4);">
+                                    <button class="btn btn-light w-100 calculator-button">4</button>
+                                </div>
+                                <div class="col-4 text-center" onclick="agregarNumeroTer(5);">
+                                    <button class="btn btn-light w-100 calculator-button">5</button>
+                                </div>
+                                <div class="col-4 text-center" onclick="agregarNumeroTer(6);">
+                                    <button class="btn btn-light w-100 calculator-button">6</button>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4 text-center" onclick="agregarNumeroTer(7);">
+                                    <button class="btn btn-light w-100 calculator-button">7</button>
+                                </div>
+                                <div class="col-4 text-center" onclick="agregarNumeroTer(8);">
+                                    <button class="btn btn-light w-100 calculator-button">8</button>
+                                </div>
+                                <div class="col-4 text-center" onclick="agregarNumeroTer(9);">
+                                    <button class="btn btn-light w-100 calculator-button">9</button>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-4 text-center" onclick="agregarNumeroTer('#');">
+                                    <button class="btn btn-light w-100 calculator-button">#</button>
+                                </div>
+                                <div class="col-4 text-center" onclick="agregarNumeroTer(0);">
+                                    <button class="btn btn-light w-100 calculator-button">0</button>
+                                </div>
+                                <div class="col-4 text-center" onclick="agregarNumeroTer('.');">
+                                    <button class="btn btn-light w-100 calculator-button">.</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div> 
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="procesarCerrarCajaAuto();">Cierre Auto.</button>
+                <button type="button" class="btn btn-primary" onclick="procesarCerrarCaja();">Guardar</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>

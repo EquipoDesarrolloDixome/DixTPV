@@ -1,0 +1,9 @@
+<div class="col-md-4 mb-4">
+  <div class="card h-90 border-camarero" onclick="seleccionarCamarero('{{ waiter.codagente }}', '{{ waiter.clave }}')">
+    <div class="card-body text-center card-camarero" id="camarero_{{ waiter.codagente }}"
+         data-codagente="{{ waiter.codagente }}"
+         data-pwdCamarero="{{ waiter.clave }}">
+      <strong>{{ waiter.nombre|length > 15 ? waiter.nombre|slice(0, 15) ~ '...' : waiter.nombre }}</strong>
+    </div>
+  </div>
+</div>

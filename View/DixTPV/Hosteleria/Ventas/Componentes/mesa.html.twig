@@ -1,0 +1,124 @@
+{% block css %}
+    <link rel="stylesheet" href="{{ asset('Dinamic/Assets/CSS/Componentes/mesacss.css') }}?v=6"/>
+{% endblock %}
+
+{% set salones = fsc.salones|default([]) %}
+{% set firstSalon = salones|length ? salones|first : null %}
+{% set firstSalonId = firstSalon ? firstSalon.idsalon : '' %}
+{% set firstSalonName = firstSalon ? firstSalon.nombre : '' %}
+
+<div class="tpv-floor-layout">
+    <aside id="salonesContainer" class="tpv-floor-sidebar">
+        <h2 class="tpv-floor-sidebar__title">
+            Salones
+        </h2>
+        <div class="tpv-floor-sidebar__list">
+            {% for salon in salones %}
+                {% set salonDescripcion = salon.descripcion|default('') %}
+                <button
+                    type="button"
+                    class="salon-card {% if loop.first %}salon-seleccionado{% endif %}"
+                    data-id="{{ salon.idsalon }}"
+                    data-nombre="{{ salon.nombre }}"
+                    onclick="seleccionarSalon('{{ salon.idsalon }}', '{{ salon.nombre|e('js') }}'); actualizarNombreSalonActivo('{{ salon.nombre|e('js') }}');">
+                    <span class="salon-card__name">{{ salon.nombre }}</span>
+                    {% if salonDescripcion %}
+                        <small class="salon-card__description">{{ salonDescripcion }}</small>
+                    {% endif %}
+                </button>
+            {% endfor %}
+        </div>
+    </aside>
+
+    <section class="tpv-floor-stage">
+        <header class="tpv-floor-stage__header">
+            <div>
+                <h2 class="tpv-floor-stage__title" id="salonActivoNombre">
+                    {{ firstSalonName ? firstSalonName : 'Mesas' }}
+                </h2>
+                <p class="tpv-floor-stage__subtitle">
+                    Arrastre las mesas para crear el plano de su sala. Toque para seleccionar.
+                </p>
+            </div>
+            <div class="tpv-floor-stage__legend">
+                <span class="legend-dot legend-dot--free"></span> Libre
+                <span class="legend-dot legend-dot--busy"></span> Ocupada
+            </div>
+        </header>
+
+        <div class="tpv-floor-canvas-wrapper">
+            <div
+                id="mesasContainer"
+                class="tpv-floor-canvas"
+                data-active-salon="{{ firstSalonId }}"
+                data-floor-guides="true">
+                {% for mesa in fsc.mesas|default([]) %}
+                    {% set mesa_class = mesa.estado == 'ocupada' ? 'mesa-ocupada' : 'mesa-disponible' %}
+                    {% set mesaComensales = mesa.comensales|default(0) %}
+                    {% set mesaTipo = mesa.tipo_mesa|default('')|lower %}
+                    {% set mesaForma = 'rectangular' %}
+                    {% if 'redonda' in mesaTipo or 'circular' in mesaTipo or 'round' in mesaTipo or 'circle' in mesaTipo or mesaComensales <= 4 %}
+                        {% set mesaForma = 'circular' %}
+                    {% elseif 'barra' in mesaTipo or 'mostrador' in mesaTipo or 'bar' in mesaTipo %}
+                        {% set mesaForma = 'barra' %}
+                    {% endif %}
+                    {% if mesaForma != 'circular' and mesaComensales <= 2 %}
+                        {% set mesaForma = 'circular' %}
+                    {% endif %}
+                    {% set mesaSeatCount = mesaComensales > 0 ? mesaComensales : 0 %}
+                    <div
+                        class="mesa-card {{ mesa_class }} mesa-shape-{{ mesaForma }} {% if mesa.idsalon != firstSalonId %}hidden{% endif %}"
+                        role="button"
+                        tabindex="0"
+                        data-iddelsalon="{{ mesa.idsalon }}"
+                        data-mesa-id="{{ mesa.idmesa }}"
+                        data-mesa-nombre="{{ mesa.nombre }}"
+                        data-nombre="{{ mesa.nombre }}"
+                        data-posx="{{ mesa.posx is not null ? mesa.posx|number_format(4, '.', '') : '' }}"
+                        data-posy="{{ mesa.posy is not null ? mesa.posy|number_format(4, '.', '') : '' }}"
+                        data-default-salon="{{ firstSalonId }}"
+                        data-estado="{{ mesa.estado }}"
+                        data-comensales="{{ mesaComensales }}"
+                        data-shape="{{ mesaForma }}"
+                        data-seats="{{ mesaSeatCount }}"
+                        title="{{ mesa.nombre }}{% if mesaSeatCount %} - {{ mesaSeatCount }} pax{% endif %}"
+                        aria-label="{{ mesa.nombre }}{% if mesaSeatCount %} ({{ mesaSeatCount }} comensales){% endif %}"
+                        onclick="handleMesaClick(this, '{{ mesa.nombre|e('js') }}', '{{ aparcado.idcomanda|default('')|e('js') }}');">
+                        <svg class="mesa-card__svg" viewBox="-60 -60 120 120" role="presentation" focusable="false">
+                            {% if mesaSeatCount > 0 %}
+                                {% for idx in 0..(mesaSeatCount - 1) %}
+                                    {% set angle = (360 / mesaSeatCount) * idx %}
+                                    <g class="mesa-card__chair" transform="rotate({{ angle|number_format(2, '.', '') }}) translate(44 0)">
+                                        <rect x="-8" y="-12" width="16" height="24" rx="5" ry="5"></rect>
+                                    </g>
+                                {% endfor %}
+                            {% endif %}
+                            {% if mesaForma == 'circular' %}
+                                <circle class="mesa-card__table-surface" r="28"></circle>
+                            {% elseif mesaForma == 'barra' %}
+                                <rect class="mesa-card__table-surface" x="-42" y="-18" width="84" height="36" rx="12"></rect>
+                            {% else %}
+                                <rect class="mesa-card__table-surface" x="-38" y="-26" width="76" height="52" rx="14"></rect>
+                            {% endif %}
+                            <text class="mesa-card__label" text-anchor="middle" dominant-baseline="middle">{{ mesa.nombre }}</text>
+                            {% if mesaSeatCount > 0 %}
+                                <text class="mesa-card__seats-count" text-anchor="middle" dominant-baseline="hanging" y="34">{{ mesaSeatCount }}</text>
+                            {% endif %}
+                        </svg>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <footer class="tpv-floor-stage__footer">
+            <div id="mesaSeleccionada" class="tpv-floor-selection"></div>
+            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="resetearPlanoSalones();">
+                Reiniciar posiciones
+            </button>
+        </footer>
+    </section>
+</div>
+
+<script>
+    window.aparcados = {{ fsc.aparcados | json_encode() | raw }};
+</script>
