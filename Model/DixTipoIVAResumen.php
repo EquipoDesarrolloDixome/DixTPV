@@ -13,6 +13,8 @@ class DixTipoIVAResumen extends ModelClass
     public $idcaja;
     public $codimpuesto;
     public $total;
+    public $base_total;
+    public $tax_total;
 
     public function clear(): void
     {
@@ -21,6 +23,8 @@ class DixTipoIVAResumen extends ModelClass
         $this->idcaja = null;
         $this->codimpuesto = '';
         $this->total = 0.0;
+        $this->base_total = 0.0;
+        $this->tax_total = 0.0;
     }
 
     public static function primaryColumn(): string

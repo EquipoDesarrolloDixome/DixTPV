@@ -58,6 +58,8 @@ class EditDixTPVCaja extends EditController {
         $this->setViewColumnLabels($view, [
             'iddixtipoiva' => 'dixtpv-tax-summary-id',
             'codimpuesto' => 'dixtpv-tax-summary-code',
+            'base_total' => 'dixtpv-tax-summary-base',
+            'tax_total' => 'dixtpv-tax-summary-tax',
             'total' => 'dixtpv-tax-summary-total',
         ]);
     }

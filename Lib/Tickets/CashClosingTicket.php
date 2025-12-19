@@ -281,10 +281,14 @@ final class CashClosingTicket extends BaseTicket
         foreach ($items as $item) {
             if (is_array($item)) {
                 $code = $item['codimpuesto'] ?? '';
-                $amount = (float)($item['total'] ?? 0.0);
+                $netAmount = (float)($item['base_total'] ?? 0.0);
+                $taxAmount = (float)($item['tax_total'] ?? 0.0);
+                $grossAmount = (float)($item['total'] ?? ($netAmount + $taxAmount));
             } else {
                 $code = $item->codimpuesto;
-                $amount = (float)($item->total ?? 0.0);
+                $netAmount = (float)($item->base_total ?? 0.0);
+                $taxAmount = (float)($item->tax_total ?? 0.0);
+                $grossAmount = (float)($item->total ?? ($netAmount + $taxAmount));
             }
 
             $tax = new Impuesto();
@@ -292,7 +296,14 @@ final class CashClosingTicket extends BaseTicket
             if ($code && $tax->loadFromCode($code)) {
                 $label = trim($tax->descripcion);
             }
-            static::printMoneyValue($printer, $label, $amount);
+
+            $netLabel = sprintf('%s (%s)', $label, static::$i18n->trans('dixtpv-tax-summary-base'));
+            $taxLabel = sprintf('%s (%s)', $label, static::$i18n->trans('dixtpv-tax-summary-tax'));
+            $grossLabel = sprintf('%s (%s)', $label, static::$i18n->trans('dixtpv-tax-summary-total'));
+
+            static::printMoneyValue($printer, $netLabel, $netAmount);
+            static::printMoneyValue($printer, $taxLabel, $taxAmount);
+            static::printMoneyValue($printer, $grossLabel, $grossAmount);
         }
 
         static::$escpos->text("\n");
@@ -653,15 +664,20 @@ final class CashClosingTicket extends BaseTicket
                 }
                 $ivaPct = (float)($line->iva ?? 0.0);
                 $recargoPct = (float)($line->recargo ?? 0.0);
-                $total = $net * (1.0 + (($ivaPct + $recargoPct) / 100.0));
+                $taxAmount = $net * (($ivaPct + $recargoPct) / 100.0);
+                $total = $net + $taxAmount;
 
                 if (!isset($summary[$key])) {
                     $summary[$key] = [
                         'codimpuesto' => $code,
                         'total' => 0.0,
+                        'base_total' => 0.0,
+                        'tax_total' => 0.0,
                     ];
                 }
                 $summary[$key]['total'] += $total;
+                $summary[$key]['base_total'] += $net;
+                $summary[$key]['tax_total'] += $taxAmount;
             }
         }
 

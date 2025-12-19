@@ -230,7 +230,8 @@ public static function registrarFacturaResumenes(FacturaCliente $factura, array 
                 $recargoPct = (float)$impModel->recargo;
             }
             $totalConIVA = $base * (1.0 + ($ivaPct + $recargoPct) / 100.0);
-            self::upsertResumenIVA($factura->idcaja, $cod, $totalConIVA);
+            $impuestos = $totalConIVA - $base;
+            self::upsertResumenIVA($factura->idcaja, $cod, $totalConIVA, $base, $impuestos);
         }
 
         $totalLineaConImpuestos = $base * (1.0 + ($ivaPct + $recargoPct) / 100.0);
@@ -368,9 +369,14 @@ private static function upsertResumenFormasPago($idcaja, $codpago, float $delta)
         $item->save();
     }
 }
-private static function upsertResumenIVA($idcaja, $codimpuesto, float $delta): void
+private static function upsertResumenIVA($idcaja, $codimpuesto, float $totalDelta, float $baseDelta, float $taxDelta): void
 {
-    if (!$idcaja || !$codimpuesto || $delta == 0.0) return;
+    if (!$idcaja || !$codimpuesto) {
+        return;
+    }
+    if (abs($totalDelta) < 0.0001 && abs($baseDelta) < 0.0001 && abs($taxDelta) < 0.0001) {
+        return;
+    }
 
     $res = new DinDixTipoIVAResumen();
     $where = [
@@ -381,19 +387,27 @@ private static function upsertResumenIVA($idcaja, $codimpuesto, float $delta): v
 
     if (!empty($filas)) {
         $keep = $filas[0];
-        $sum = (float)$keep->total + $delta;
+        $sumTotal = (float)$keep->total + $totalDelta;
+        $sumBase = (float)($keep->base_total ?? 0.0) + $baseDelta;
+        $sumTax = (float)($keep->tax_total ?? 0.0) + $taxDelta;
         // si hubiera duplicadas antiguas, las consolidamos
         for ($i = 1; $i < count($filas); $i++) {
-            $sum += (float)$filas[$i]->total;
+            $sumTotal += (float)$filas[$i]->total;
+            $sumBase += (float)($filas[$i]->base_total ?? 0.0);
+            $sumTax += (float)($filas[$i]->tax_total ?? 0.0);
             $filas[$i]->delete();
         }
-        $keep->total = max(0.0, $sum);
+        $keep->total = max(0.0, $sumTotal);
+        $keep->base_total = max(0.0, $sumBase);
+        $keep->tax_total = max(0.0, $sumTax);
         $keep->save();
     } else {
         $item = new DinDixTipoIVAResumen();
         $item->idcaja = $idcaja;
         $item->codimpuesto = $codimpuesto;
-        $item->total = max(0.0, $delta);
+        $item->total = max(0.0, $totalDelta);
+        $item->base_total = max(0.0, $baseDelta);
+        $item->tax_total = max(0.0, $taxDelta);
         $item->save();
     }
 }
