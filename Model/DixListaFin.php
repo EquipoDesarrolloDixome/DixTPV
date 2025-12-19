@@ -49,4 +49,12 @@ class DixListaFin extends ModelClass {
     public function install(): string {
         return parent::install();
     }
+
+    public function url(string $type = 'auto', string $list = 'List'): string {
+        if (($type === 'auto' || $type === 'edit') && !empty($this->codigofactura)) {
+            return 'DixTPVInvoicePdf?code=' . rawurlencode($this->codigofactura);
+        }
+
+        return parent::url($type, $list);
+    }
 }

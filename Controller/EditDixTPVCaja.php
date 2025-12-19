@@ -2,10 +2,12 @@
 
 namespace FacturaScripts\Plugins\DixTPV\Controller;
 
-use FacturaScripts\Core\Lib\ExtendedController\EditController;
 use FacturaScripts\Core\Base\DataBase\DataBaseWhere;
 use FacturaScripts\Core\Lib\ExtendedController\BaseView;
+use FacturaScripts\Core\Lib\ExtendedController\EditController;
 use FacturaScripts\Core\Tools;
+use FacturaScripts\Dinamic\Lib\AssetManager;
+use const FS_ROUTE;
 
 class EditDixTPVCaja extends EditController {
 
@@ -33,6 +35,7 @@ class EditDixTPVCaja extends EditController {
     }
     public function createListaFinView($viewName = 'ListDixListaFin'): void {
         $view = $this->addListView($viewName, 'DixListaFin', Tools::trans('dixtpv-tab-history'), 'fas fa-sticky-note');
+        $this->setSettings($viewName, 'clickable', true);
         $view->addOrderBy(['idlista'], Tools::trans('dixtpv-closings-history-id'), 2);
         $this->setViewColumnLabels($view, [
             'idlista' => 'dixtpv-closings-history-id',
@@ -42,9 +45,18 @@ class EditDixTPVCaja extends EditController {
             'total' => 'dixtpv-closings-total',
             'importeentregado' => 'dixtpv-closings-paid',
         ]);
+        $invoiceColumn = $view->columnForField('codigofactura');
+        if ($invoiceColumn) {
+            $invoiceColumn->widget->onclick = 'DixTPVInvoicePdf';
+            $invoiceColumn->class = trim(($invoiceColumn->class ?? '') . ' dixtpv-invoice-cell');
+        }
+        if ($view->getRow('status')) {
+            $view->getRow('status')->class = trim(($view->getRow('status')->class ?? '') . ' dix-invoice-row');
+        }
     }
     public function createFormasPagoResumenView($viewName = 'ListDixFormasPagoResumen'): void {
         $view = $this->addListView($viewName, 'DixFormasPagoResumen', Tools::trans('dixtpv-tab-payments'), 'fas fa-sticky-note');
+        $this->setSettings($viewName, 'clickable', false);
         $view->addOrderBy(['iddixformaspago'], Tools::trans('dixtpv-payment-summary-id'), 2);
         $this->setViewColumnLabels($view, [
             'iddixformaspago' => 'dixtpv-payment-summary-id',
@@ -54,6 +66,7 @@ class EditDixTPVCaja extends EditController {
     }
     public function createTiposIvaView($viewName = 'ListDixTipoIVAResumen'): void {
         $view = $this->addListView($viewName, 'DixTipoIVAResumen', Tools::trans('dixtpv-tab-taxes'), 'fas fa-sticky-note');
+        $this->setSettings($viewName, 'clickable', false);
         $view->addOrderBy(['iddixtipoiva'], Tools::trans('dixtpv-tax-summary-id'), 2);
         $this->setViewColumnLabels($view, [
             'iddixtipoiva' => 'dixtpv-tax-summary-id',
@@ -65,6 +78,7 @@ class EditDixTPVCaja extends EditController {
     }
     public function createResumenProductosView($viewName = 'ListDixProductosResumen'): void {
         $view = $this->addListView($viewName, 'DixProductosResumen', Tools::trans('dixtpv-tab-products'), 'fas fa-sticky-note');
+        $this->setSettings($viewName, 'clickable', false);
         $view->addOrderBy(['idprodresumen'], Tools::trans('dixtpv-products-summary-id'), 2);
         $this->setViewColumnLabels($view, [
             'idprodresumen' => 'dixtpv-products-summary-id',
