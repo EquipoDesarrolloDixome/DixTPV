@@ -1,4 +1,70 @@
 var inputSeleccionado = null;
+const DIX_COBRO_CLIENT_STORAGE_KEY = 'dixtpvCobroClient';
+
+function dixSyncCobroClientTargets(code, name) {
+    const clientCode = code || '';
+    const clientName = typeof name === 'string' ? name : '';
+    const hiddenMain = document.getElementById('cliente');
+    if (hiddenMain) {
+        hiddenMain.value = clientCode;
+    }
+    const textMain = document.getElementById('nombre_cliente');
+    if (textMain) {
+        textMain.value = clientName;
+    }
+    const aparcarHidden = document.getElementById('cliente_aparcar');
+    if (aparcarHidden) {
+        aparcarHidden.value = clientCode;
+    }
+    const aparcarText = document.getElementById('nombre_cliente_aparcar');
+    if (aparcarText) {
+        aparcarText.value = clientName;
+    }
+    const cobrarHidden = document.querySelector('#cliente_cobro_modal input[name="codcliente"]');
+    if (cobrarHidden) {
+        cobrarHidden.value = clientCode;
+    }
+}
+
+function dixStoreCobroClientSelection(code, name) {
+    if (typeof sessionStorage === 'undefined') {
+        return;
+    }
+    try {
+        sessionStorage.setItem(DIX_COBRO_CLIENT_STORAGE_KEY, JSON.stringify({
+            code: code || '',
+            name: name || ''
+        }));
+    } catch (err) {
+        console.warn('No se pudo guardar el cliente seleccionado para cobrar.', err);
+    }
+}
+
+function dixRestoreCobroClientSelection() {
+    if (typeof sessionStorage === 'undefined') {
+        return;
+    }
+    const raw = sessionStorage.getItem(DIX_COBRO_CLIENT_STORAGE_KEY);
+    if (!raw) {
+        return;
+    }
+    let saved = null;
+    try {
+        saved = JSON.parse(raw);
+    } catch (err) {
+        console.warn('No se pudo leer el cliente guardado para cobrar.', err);
+        return;
+    }
+    const code = (saved && typeof saved.code === 'string') ? saved.code.trim() : '';
+    if (code === '') {
+        return;
+    }
+    const name = (saved && typeof saved.name === 'string') ? saved.name : '';
+    dixSyncCobroClientTargets(code, name);
+    if (typeof window.dixOnClientChanged === 'function') {
+        window.dixOnClientChanged(code);
+    }
+}
 
 function agregarNumero(numero) {
     if (!inputSeleccionado) return;
@@ -256,14 +322,9 @@ function setToast(message, style = 'info', title = '', time = 10000) {
             return;
         }
 
-        const hiddenMain = document.getElementById('cliente');
-        const textMain = document.getElementById('nombre_cliente');
-        if (hiddenMain) {
-            hiddenMain.value = code;
-        }
-        if (textMain && textModal) {
-            textMain.value = textModal.value || '';
-        }
+        const clientName = textModal ? (textModal.value || '') : '';
+        dixSyncCobroClientTargets(code, clientName);
+        dixStoreCobroClientSelection(code, clientName);
 
         if (typeof window.dixOnClientChanged === 'function') {
             window.dixOnClientChanged(code);
@@ -275,6 +336,10 @@ function setToast(message, style = 'info', title = '', time = 10000) {
         }
     };
 })();
+
+document.addEventListener('DOMContentLoaded', function () {
+    dixRestoreCobroClientSelection();
+});
 
 function imprimirUltimo() {
     const storedDoc = localStorage.getItem('ultimoDocumentoTPV');
