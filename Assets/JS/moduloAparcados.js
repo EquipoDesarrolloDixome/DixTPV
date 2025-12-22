@@ -8,9 +8,106 @@ function isModoHosteleria() {
 let clienteAparcarResolver = null;
 let destinoAparcadoResolver = null;
 let aparcadoOrigenPendiente = null;
+let moverMesaEstadoPrevio = null;
+let moverMesaCompletando = false;
+let moverMesaModalActivo = false;
+
+function restaurarComandaTrasCancelarMovimiento(productos) {
+    if (!moverMesaEstadoPrevio || !Array.isArray(productos) || productos.length === 0) {
+        return;
+    }
+    const mesaOriginal = moverMesaEstadoPrevio.mesa;
+    if (!mesaOriginal || mesaOriginal === 'BRA-000') {
+        return;
+    }
+    const salonOriginal = moverMesaEstadoPrevio.salon || sessionStorage.getItem('salonSeleccionado') || '1';
+    const idComandaOriginal = moverMesaEstadoPrevio.idcomanda || 0;
+    const codCliente = moverMesaEstadoPrevio.codcliente || document.getElementById('cliente')?.value || '';
+    $.ajax({
+        method: "POST",
+        url: window.location.href,
+        data: {
+            action: 'aparcarCuenta',
+            cesta: productos,
+            salon: salonOriginal,
+            mesa: mesaOriginal,
+            codcliente: codCliente,
+            idcomanda: idComandaOriginal
+        }
+    }).fail(function (jqXHR, textStatus) {
+        console.warn('No se pudo restaurar la comanda tras cancelar mover mesa.', textStatus, jqXHR?.responseText);
+    });
+}
 
 function resetAparcadoOrigenPendiente() {
     aparcadoOrigenPendiente = null;
+}
+
+function rememberMoverMesaState() {
+    moverMesaEstadoPrevio = {
+        salon: sessionStorage.getItem('salonSeleccionado'),
+        mesa: sessionStorage.getItem('mesaSeleccionada'),
+        idcomanda: sessionStorage.getItem('idcomanda'),
+        appendMode: sessionStorage.getItem('aparcadoAppendMode'),
+        codcliente: document.getElementById('cliente')?.value || ''
+    };
+    moverMesaCompletando = false;
+    moverMesaModalActivo = true;
+}
+
+function restoreSessionEntry(key, value) {
+    if (!key) {
+        return;
+    }
+    if (value === null || typeof value === 'undefined') {
+        sessionStorage.removeItem(key);
+        return;
+    }
+    sessionStorage.setItem(key, value);
+}
+
+function resetMoverMesaState() {
+    moverMesaEstadoPrevio = null;
+    moverMesaCompletando = false;
+    moverMesaModalActivo = false;
+}
+
+function cancelarMoverMesaSiAplica() {
+    if (!moverMesaEstadoPrevio && !localStorage.getItem('carritoPendienteAsignar')) {
+        moverMesaModalActivo = false;
+        return;
+    }
+    const temporalRaw = localStorage.getItem('carritoTemporal');
+    let carritoRecuperado = null;
+    if (temporalRaw) {
+        try {
+            const productos = JSON.parse(temporalRaw) || [];
+            carritoRecuperado = productos;
+            localStorage.setItem('carrito', JSON.stringify(productos));
+        } catch (err) {
+            console.warn('No se pudo restaurar el carrito temporal al cancelar mover mesa.', err);
+        }
+        localStorage.removeItem('carritoTemporal');
+        if (typeof actualizarCarrito === 'function') {
+            try {
+                actualizarCarrito();
+            } catch (refreshErr) {
+                console.warn('No se pudo refrescar el carrito tras cancelar mover mesa.', refreshErr);
+            }
+        }
+    }
+    if (moverMesaEstadoPrevio) {
+        restoreSessionEntry('salonSeleccionado', moverMesaEstadoPrevio.salon);
+        restoreSessionEntry('mesaSeleccionada', moverMesaEstadoPrevio.mesa);
+        restoreSessionEntry('idcomanda', moverMesaEstadoPrevio.idcomanda);
+        restoreSessionEntry('aparcadoAppendMode', moverMesaEstadoPrevio.appendMode);
+    }
+    if (carritoRecuperado && carritoRecuperado.length) {
+        restaurarComandaTrasCancelarMovimiento(carritoRecuperado);
+    }
+    localStorage.removeItem('carritoPendienteAsignar');
+    aparcadoOrigenPendiente = null;
+    resetMoverMesaState();
 }
 
 function getClienteActualParaAparcar() {
@@ -248,10 +345,20 @@ window.dixSeleccionarClienteParaAparcar = seleccionarClienteParaAparcar;
 window.dixResetAparcadoOrigenPendiente = resetAparcadoOrigenPendiente;
 
 $(document).ready(function () {
+    $('#modalmesas').on('hide.bs.modal', function () {
+        if (moverMesaModalActivo && moverMesaEstadoPrevio && !moverMesaCompletando) {
+            cancelarMoverMesaSiAplica();
+        }
+    });
+
     $('#modalmesas').on('hidden.bs.modal', function () {
         const mesaActual = sessionStorage.getItem('mesaSeleccionada') || 'BRA-000';
         if ((mesaActual === 'BRA-000' || mesaActual === '') && aparcadoOrigenPendiente) {
             aparcadoOrigenPendiente = null;
+        }
+        if (!moverMesaModalActivo || !moverMesaCompletando) {
+            moverMesaEstadoPrevio = null;
+            moverMesaModalActivo = false;
         }
     });
 
@@ -284,6 +391,10 @@ function moverAparcadoListadoAMesa(idcomanda) {
             }
 
             aparcadoOrigenPendiente = parsedId;
+            const salonPrevio = sessionStorage.getItem('salonSeleccionado');
+            const mesaPrevia = sessionStorage.getItem('mesaSeleccionada');
+            const idComandaPrevio = sessionStorage.getItem('idcomanda');
+            const appendPrevio = sessionStorage.getItem('aparcadoAppendMode');
             sessionStorage.removeItem('mesaSeleccionada');
             sessionStorage.removeItem('salonSeleccionado');
             sessionStorage.removeItem('idcomanda');
@@ -293,6 +404,15 @@ function moverAparcadoListadoAMesa(idcomanda) {
                 idcomanda: parsedId
             };
             localStorage.setItem('carritoPendienteAsignar', JSON.stringify(payload));
+            moverMesaEstadoPrevio = {
+                salon: salonPrevio,
+                mesa: mesaPrevia,
+                idcomanda: idComandaPrevio,
+                appendMode: appendPrevio,
+                codcliente: document.getElementById('cliente')?.value || ''
+            };
+            moverMesaCompletando = false;
+            moverMesaModalActivo = true;
             cerrarModalAparcadosVisibles();
             mostrarModalSeleccionMesas();
         },
@@ -355,15 +475,24 @@ function aparcarCuentaDiv() {
 function moverMesa() {
     const carritoActual = JSON.parse(localStorage.getItem('carrito')) || [];
 
-    // Guardar carrito actual temporalmente
-    localStorage.setItem('carritoTemporal', JSON.stringify(carritoActual));
+    const salonActual = sessionStorage.getItem('salonSeleccionado') || '1';
+    const mesaActual = sessionStorage.getItem('mesaSeleccionada') || 'BRA-000';
 
-    vaciarCesta1(false);
+    rememberMoverMesaState();
+    moverMesaCompletando = false;
+
+    if (mesaActual !== 'BRA-000') {
+        localStorage.setItem('carritoTemporal', JSON.stringify(carritoActual));
+        vaciarCesta1(false);
+    } else {
+        localStorage.setItem('carritoTemporal', JSON.stringify(carritoActual));
+    }
 
     $("#modalmesas").modal("show");
     seleccionarSalon(1);
 }
 function seleccionarMesa(nombreMesa, idComanda) {
+    moverMesaCompletando = true;
     const aparcado = (aparcados || []).find(ap => ap.nombremesa === nombreMesa) || null;
     const mesaAnterior = sessionStorage.getItem('mesaSeleccionada');
     const salonAnterior = sessionStorage.getItem('salonSeleccionado');
@@ -397,6 +526,7 @@ function seleccionarMesa(nombreMesa, idComanda) {
                 sessionStorage.setItem('idcomanda', aparcado.idcomanda);
                 localStorage.setItem('idcomanda', aparcado.idcomanda);
                 sessionStorage.setItem('aparcadoAppendMode', '1');
+                resetMoverMesaState();
                 $("#modalmesas").modal("hide");
                 setTimeout(() => {
                     actualizarCarrito();
@@ -413,6 +543,7 @@ function seleccionarMesa(nombreMesa, idComanda) {
                     localStorage.setItem('carrito', JSON.stringify(mezclado));
                     sessionStorage.setItem('idcomanda', idDestino);
                     localStorage.setItem('idcomanda', idDestino);
+                    resetMoverMesaState();
                     $("#modalmesas").modal("hide");
                     setTimeout(() => {
                         actualizarCarrito();
@@ -459,6 +590,7 @@ function seleccionarMesa(nombreMesa, idComanda) {
                 localStorage.setItem('idcomanda', pendientesGenerales.idcomanda);
             }
 
+            resetMoverMesaState();
             $("#modalmesas").modal("hide");
             setTimeout(() => {
                 actualizarCarrito();
@@ -470,6 +602,7 @@ function seleccionarMesa(nombreMesa, idComanda) {
         if (hayCarritoTemporal) {
             localStorage.setItem('carrito', JSON.stringify(carritoTemporal));
             localStorage.removeItem('carritoTemporal');
+            resetMoverMesaState();
 
             $("#modalmesas").modal("hide");
 
@@ -481,6 +614,7 @@ function seleccionarMesa(nombreMesa, idComanda) {
         }
 
         const carritoRefrescado = JSON.parse(localStorage.getItem('carrito')) || [];
+        resetMoverMesaState();
         $("#modalmesas").modal("hide");
 
         const esServicioRapido = mesaAnterior === null || mesaAnterior === 'BRA-000';
